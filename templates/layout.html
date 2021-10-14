@@ -26,9 +26,9 @@
 
 </head>
 
-<body id="page-top">
+<body id="page-top" class="bg-gradient-primary">
 
-    {% block wapper %}
+    {% block wrapper %}
     <!-- Page Wrapper -->
     <div id="wrapper">
 
@@ -392,7 +392,7 @@
 
     </div>
     <!-- End of Page Wrapper -->
-    {% endblock wapper %}
+    {% endblock wrapper %}
 
     {% block login %} {% endblock login %}
 
@@ -416,7 +416,7 @@
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <a class="btn btn-primary" href="{% url 'bases:logout' %}">Logout</a>
                 </div>
             </div>
         </div>
