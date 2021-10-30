@@ -1,0 +1,31 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <form action="{% url 'inventario:categoria_delete' categoria.id %}" method="POST">
+            {% csrf_token %}
+            <div class="col-xl-12 col-md-12 mb-12">
+                <div class="card border-left-danger shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                    ¿Desea eliminar {{ categoria.nombre }}?
+                                </div>
+                                <button type="submit" class="btn btn-danger">
+                                    <span class="fa fa-save"></span>
+                                    Eliminar
+                                </button>
+                                <button type="button" class="btn btn-success" onclick="return cerrar_modal()"></button:button>
+                                    <span class="fa fa-undo"></span>
+                                    Cancelar
+                                </a>
+                            </div>
+                            <div class="col-auto">
+                                <i class="far fa-question-circle fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

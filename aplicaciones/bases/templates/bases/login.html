@@ -18,7 +18,10 @@
                                 <div class="p-5">
 
                                     <div class="text-center">
-                                        <h1 class="h4 text-gray-900 mb-4">Login</h1>
+                                        <h1 class="h4 text-gray-900 mb-4">Bienvenido</h1>
+                                        {% if not form.errors %}
+                                        <p class="mb-4">Por favor, inicia sesión para ingresar</p>
+                                        {% endif %}
                                         <small class="text-danger">
                                             {% if form.errors %}
                                                 {% for field in form %}
@@ -52,7 +55,6 @@
 
                                         <hr>
                                         <button type="submit" class="btn btn-primary btn-user btn-block">Acceder</button>
-
                                     </form>
                                     
                                 </div>

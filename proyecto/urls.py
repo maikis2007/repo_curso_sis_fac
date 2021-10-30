@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # Llamamos a las urls de las aplicaciones desde aquí
     path('', include("aplicaciones.bases.urls", namespace="bases") ),
+    path('inv/', include("aplicaciones.inventario.urls", namespace="inventario") ),
 ]
