@@ -1,6 +1,7 @@
 function abrir_modal(url){
     $("#popup").load(url, function(){
         $(this).modal({
+            backdrop: 'static',
             keyboard: false
         })
         $(this).modal('show');
@@ -8,7 +9,7 @@ function abrir_modal(url){
     return false;
 }
 
-function cerrar_modal(url){
+function cerrar_modal(){
     $("#popup").modal('hide');
     return false;
 }

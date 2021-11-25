@@ -28,6 +28,10 @@
     <link rel="preload" href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" as="style">
     <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
 
+    <!-- My styles -->
+    <link rel="preload" href="{% static 'css/style.css' %}" as="style">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
 </head>
 
 <body id="page-top" class="bg-gradient-primary">
@@ -44,14 +48,14 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">El <sup>Maik</sup></div>
+                <div class="sidebar-brand-text mx-1">El <sup>Maik</sup></div>
             </a>
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item">
+            <li class="nav-item {% block home_active %} {% endblock home_active %}">
                 <a class="nav-link" href="{% url 'bases:home' %}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
@@ -66,17 +70,17 @@
             </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
+            <li class="nav-item {% block catalogos_active %} {% endblock catalogos_active %}">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Catálogos</span>
                 </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseTwo" class="collapse {% block inventario_show %} {% endblock inventario_show %}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Inventario</h6>
-                        <a class="collapse-item" href="{% url 'inventario:categorias' %}">Categorías</a>
-                        <a class="collapse-item" href="#">Cards</a>
+                        <a class="collapse-item {% block categoria_active %} {% endblock categoria_active %}" href="{% url 'inv:categorias' %}">Categorías</a>
+                        <a class="collapse-item {% block subcategoria_active %} {% endblock subcategoria_active %}" href="{% url 'inv:subcategorias' %}">SubCategorías</a>
                     </div>
                 </div>
             </li>

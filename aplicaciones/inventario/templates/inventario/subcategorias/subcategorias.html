@@ -1,18 +1,24 @@
 {% extends 'layout.html' %}
 
-{% load static %} <!-- Cargar la etiqueta static, después de la layout.html -->
+{% load static %}
+
+{% block catalogos_active %} active {% endblock catalogos_active %}
+
+{% block inventario_show %} show {% endblock inventario_show %}
+
+{% block subcategoria_active %} active {% endblock subcategoria_active %}
 
 {% block page_content %}
     <div class="col-lg-12">
-        {% if categorias %}
+        {% if subcategorias %}
             <!-- Dropdown Card Example -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Listado de las Categorías</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Listado de las SubCategorías</h6>
                     <div class="dropdown no-arrow">
-                        <a href="{% url 'inventario:categoria_new' %}" class="btn btn-success">
+                        <a href="{% url 'inv:subcategoria_new' %}" class="btn btn-success">
                             <span class="fas fa-external-link-alt"></span>
-                            Nueva Categoría
+                            Nueva SubCategoría
                         </a>
                     </div>
                 </div>
@@ -22,6 +28,7 @@
                             <thead>
                                 <th>Id</th>
                                 <th>Categoría</th>
+                                <th>SubCategoría</th>
                                 <th>Descripción</th>
                                 <th>Estado</th>
                                 <th>F. Creación</th>
@@ -29,26 +36,39 @@
                                 <th class="all">Acciones</th>
                             </thead>
                             <tbody>
-                                {% for item in categorias %}
+                                {% for item in subcategorias %}
                                 <tr>
                                     <td>{{ item.id }}</td>
+                                    <td>{{ item.categoria }}</td>
                                     <td>{{ item.nombre }}</td>
                                     <td>{{ item.descripcion }}</td>
-                                    <td>{{ item.estado|yesno:"Activo, Inactivo" }}</td>
+                                    <td>{{ item.estado|yesno:"Activa, Inactiva" }}</td>
                                     <td>{{ item.fc|date:"d/m/Y H:i:s" }}</td>
                                     <td>{{ item.fm|date:"d/m/Y H:i:s" }}</td>
                                     <td>
-                                        <a href="{% url 'inventario:categoria_edit' item.id %}" class="btn btn-warning btn-circle" role="buttton">
+                                        <a href="{% url 'inv:subcategoria_edit' item.id %}" class="btn btn-warning btn-circle">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="{% url 'inventario:categoria_inactivate' item.id %}" class="btn btn-dark btn-circle" role="buttton">
+                                        <!-- Si el estado de la categoría está activo-->
+                                        {% if item.categoria.estado %}
+                                        <a href="{% url 'inv:subcategoria_inactivate' item.id %}" class="btn btn-dark btn-circle">
                                             {% if item.estado %}
                                             <i class="fas fa-thumbs-down"></i>
                                             {% else %}
                                             <i class="fas fa-thumbs-up"></i>
                                             {% endif %}
                                         </a>
-                                        <a onclick="return abrir_modal('{% url 'inventario:categoria_delete' item.id %}')" class="btn btn-danger btn-circle" role="buttton">
+                                        {% else %}
+                                        <!-- Si el estado de la categoría está inactivo-->
+                                        <a href="{% url 'inv:subcategoria_inactivate' item.id %}" class="btn btn-dark btn-circle sin-poder-activar">
+                                            {% if item.estado %}
+                                            <i class="fas fa-thumbs-down"></i>
+                                            {% else %}
+                                            <i class="fas fa-thumbs-up"></i>
+                                            {% endif %}
+                                        </a>
+                                        {% endif %}
+                                        <a onclick="return abrir_modal('{% url 'inv:subcategoria_delete' item.id %}')" class="btn btn-danger btn-circle">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </td>   
@@ -63,16 +83,16 @@
         <!-- Default Card Example -->
             <div class="card mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold">Listado de las Categorías</h6>
+                    <h6 class="m-0 font-weight-bold">Listado de las SubCategorías</h6>
                     <div class="dropdown no-arrow">
-                        <a href="{% url 'inventario:categoria_new' %}" class="btn btn-success">
+                        <a href="{% url 'inv:subcategoria_new' %}" class="btn btn-success">
                             <span class="fas fa-external-link-alt"></span>
-                            Nueva Categoría
+                            Nueva SubCategoría
                         </a>
                     </div>
                 </div>
                 <div class="card-body">
-                    Aún no hay categorías en el sistema
+                    Aún no hay subcategorías en el sistema
                 </div>
             </div>
         {% endif %}
