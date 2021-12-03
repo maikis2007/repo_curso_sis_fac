@@ -11,7 +11,7 @@
     <meta name="description" content="Sistema de facturación y compra con Django 2.2 y más">
     <meta name="author" content="Michael Orlando Cabello Ramírez">
 
-    <title>Facturas Maik</title>
+    <title>Sistema de Compra Inventario y Facturación del Mike</title>
 
     <!-- Custom fonts for this template-->
     <link rel="preload" href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" as="style">
@@ -48,7 +48,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-1">El <sup>Maik</sup></div>
+                <div class="sidebar-brand-text mx-1">SCF - <sub>El Maik</sub></div>
             </a>
 
             <!-- Divider -->
@@ -70,17 +70,17 @@
             </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item {% block catalogos_active %} {% endblock catalogos_active %}">
+            <li class="nav-item {% block catalogos %} {% endblock catalogos %}">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
                     aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Catálogos</span>
                 </a>
-                <div id="collapseTwo" class="collapse {% block inventario_show %} {% endblock inventario_show %}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseTwo" class="collapse {% block inventario %} {% endblock inventario %}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Inventario</h6>
-                        <a class="collapse-item {% block categoria_active %} {% endblock categoria_active %}" href="{% url 'inv:categorias' %}">Categorías</a>
-                        <a class="collapse-item {% block subcategoria_active %} {% endblock subcategoria_active %}" href="{% url 'inv:subcategorias' %}">SubCategorías</a>
+                        <a class="collapse-item {% block categoria %} {% endblock categoria %}" href="{% url 'inv:categorias' %}">Categorías</a>
+                        <a class="collapse-item {% block subcategoria %} {% endblock subcategoria %}" href="{% url 'inv:subcategorias' %}">SubCategorías</a>
                     </div>
                 </div>
             </li>

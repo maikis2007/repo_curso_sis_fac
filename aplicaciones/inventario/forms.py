@@ -26,6 +26,7 @@ class SubCategoriaForm(forms.ModelForm):
     categoria = forms.ModelChoiceField(
         queryset = Categoria.objects.filter(estado=True)
     )
+
     class Meta:
         model = SubCategoria
         fields = ['categoria', 'nombre', 'descripcion', 'estado']

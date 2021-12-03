@@ -7,13 +7,34 @@ from django.urls import reverse_lazy
 from aplicaciones.inventario.models import *
 from aplicaciones.inventario.forms import *
 
-ids_categorias_falsas = []
-
+# Vista
 class CategoriaListView(LoginRequiredMixin, generic.ListView):
     model = Categoria
     template_name = "inventario/categorias/categorias.html"
     context_object_name = "categorias"
     login_url = "bases:login"
+
+# Función
+def categoria_list(request):
+    categorias = Categoria.objects.all()
+
+    """
+    categorias_inactivas = Categoria.objects.filter(estado=False).all()
+
+    if categorias:
+        print("Hay categorias, ¿se podrán crear subcategorias?")
+        if(len(categorias) == len(categorias_inactivas)):
+                print("No, porque no hay categorias 'activas'")
+        else:
+                print("Sí, porque por lo menos una está activa")
+    else:
+        print("No hay categorías, no se podran crear subcategorias")
+    """
+
+    context = {'categorias': categorias}
+    template = 'inventario/categorias/categorias.html'
+
+    return render(request, template, context)
 
 class CategoriaCreateView(LoginRequiredMixin, generic.CreateView):
     model = Categoria
@@ -46,11 +67,10 @@ class CategoriaDeleteView(LoginRequiredMixin, generic.DeleteView):
     context_object_name = "categoria"
     success_url = reverse_lazy("inv:categorias")
 
-def categoria_inactivate(request, id):
+def categoria_estado(request, id):
     categoria = Categoria.objects.filter(pk=id).first()  # Categoria inactiva o activa, sus subcategorias inactivas o activas
     subcategorias_activas = SubCategoria.objects.filter(categoria=id, estado=True).all()
     subcategorias_inactivas = SubCategoria.objects.filter(categoria=id, estado=False).all()
-
     if not categoria:
         return redirect('inv:categorias')
     else:
@@ -74,12 +94,29 @@ def categoria_inactivate(request, id):
 
         return redirect('inv:categorias')
 
+# Vista
 class SubCategoriaListView(LoginRequiredMixin, generic.ListView):
     model = SubCategoria
     template_name = "inventario/subcategorias/subcategorias.html"
     context_object_name = "subcategorias"
     login_url = "bases:login"
-    
+
+# Función
+def subcategoria_list(request):
+    subcategorias = SubCategoria.objects.all()
+
+    categorias = Categoria.objects.all()
+    cantidad_categorias = categorias.count()
+
+    categorias_inactivas = Categoria.objects.filter(estado=False).all()
+    cantidad_categorias_inactivas = categorias_inactivas.count()
+
+    context = {'categorias': categorias, 'cantidad_categorias': cantidad_categorias, 'cantidad_categorias_inactivas': cantidad_categorias_inactivas, 'subcategorias': subcategorias}
+
+    template = 'inventario/subcategorias/subcategorias.html'
+
+    return render(request, template, context)
+
 class SubCategoriaCreateView(LoginRequiredMixin, generic.CreateView):
     model = SubCategoria
     template_name = "inventario/subcategorias/subcategoria_form.html"
@@ -110,7 +147,7 @@ class SubCategoriaDeleteView(LoginRequiredMixin, generic.DeleteView):
     context_object_name = "subcategoria"
     success_url = reverse_lazy("inv:subcategorias")
 
-def subcategoria_inactivate(request, id):
+def subcategoria_estado(request, id):
     """ 
         Si la categoría está activa, las subcategorías pueden estar activas o inactivas
         Si la categoría está inactiva, las subcategorías solo pueden estar inactivas
@@ -130,5 +167,3 @@ def subcategoria_inactivate(request, id):
             subcategoria.save()
 
             return redirect('inv:subcategorias')
-    else:
-        return redirect("inv:subcategorias")

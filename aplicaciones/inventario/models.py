@@ -11,7 +11,9 @@ class Categoria(BasesModel):
         return '{}'.format(self.nombre)
 
     def save(self):
-        self.nombre = self.nombre.upper()
+        nombre_list = list(self.nombre)
+        nombre_list[0] = nombre_list[0].upper()
+        self.nombre = "".join(nombre_list)
 
         descripcion_list = list(self.descripcion)
         descripcion_list[0] = descripcion_list[0].upper()
@@ -32,7 +34,9 @@ class SubCategoria(BasesModel):
         return '{}:{}'.format(self.nombre, self.categoria.nombre)
     
     def save(self):
-        self.nombre = self.nombre.upper()
+        nombre_list = list(self.nombre)
+        nombre_list[0] = nombre_list[0].upper()
+        self.nombre = "".join(nombre_list)
 
         descripcion_list = list(self.descripcion)
         descripcion_list[0] = descripcion_list[0].upper()

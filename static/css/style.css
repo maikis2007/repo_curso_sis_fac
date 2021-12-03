@@ -1,15 +1,3 @@
-.sin-poder-activar {
-    position: relative;
-}
-
-.sin-poder-activar::after, .sin-poder-activar::before {
-    content: '';
-    position: absolute;
-    width: 45px;
-    height: 3px;
-    background-color: red;
-}
-
-.sin-poder-activar:not(:disabled):not(.disabled) {
+.inhabilitado:not(:disabled):not(.disabled) {
     cursor: no-drop;
 }

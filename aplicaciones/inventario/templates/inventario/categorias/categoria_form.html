@@ -2,11 +2,11 @@
 
 {% load static %}
 
-{% block catalogos_active %} active {% endblock catalogos_active %}
+{% block catalogos %} active {% endblock catalogos %}
 
-{% block inventario_show %} show {% endblock inventario_show %}
+{% block inventario %} show {% endblock inventario %}
 
-{% block categoria_active %} active {% endblock categoria_active %}
+{% block categoria %} active {% endblock categoria %}
 
 {% block page_content %}
     <form action="#" method="POST">
@@ -33,9 +33,7 @@
                             {% endif %}
                             <div class="row">
                                 <div class="col-4">
-                                    <div class="input-group">
-                                        {{ form.nombre|lower }}
-                                    </div>
+                                    {{ form.nombre }}
                                 </div>
                                 <div class="col-6">
                                     <div class="input-group">
