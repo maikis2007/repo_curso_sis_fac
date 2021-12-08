@@ -1,0 +1,90 @@
+{% extends 'layout.html' %}
+
+{% load static %}
+
+{% block catalogos %} active {% endblock catalogos %}
+
+{% block inventario %} show {% endblock inventario %}
+
+{% block um %} active {% endblock um %}
+
+{% block page_content %}
+    <div class="col-lg-12">
+        {% if unidades %}
+            <!-- Dropdown Card Example -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Listado de las Unidades de Medida</h6>
+                    <div class="dropdown no-arrow">
+                        <a href="{% url 'inv:um_new' %}" class="btn btn-success">
+                            <span class="fas fa-external-link-alt"></span>
+                            Nueva Unidad de Medida
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                                <th>Id</th>
+                                <th>UM</th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th>F. Creación</th>
+                                <th>F. Modificación</th>
+                                <th class="all">Acciones</th>
+                            </thead>
+                            <tbody>
+                                {% for item in unidades %}
+                                <tr>
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.nombre|upper }}</td>
+                                    <td>{{ item.descripcion }}</td>
+                                    <td>{{ item.estado|yesno:"Activa, Inactiva" }}</td>
+                                    <td>{{ item.fc|date:"d/m/Y H:i:s" }}</td>
+                                    <td>{{ item.fm|date:"d/m/Y H:i:s" }}</td>
+                                    <td>
+                                        <a href="{% url 'inv:um_edit' item.id %}" class="btn btn-warning btn-circle">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'inv:um_estado' item.id %}" class="btn btn-dark btn-circle">
+                                            {% if item.estado %}
+                                            <i class="fas fa-thumbs-down"></i>
+                                            {% else %}
+                                            <i class="fas fa-thumbs-up"></i>
+                                            {% endif %}
+                                        </a>
+                                        <a onclick="return abrir_modal('{% url 'inv:um_delete' item.id %}')" class="btn btn-danger btn-circle">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>   
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+        <!-- Default Card Example -->
+            <div class="card mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold">Listado de las Unidades de Medida</h6>
+                    <div class="dropdown no-arrow">
+                        <a href="{% url 'inv:um_new' %}" class="btn btn-success">
+                            <span class="fas fa-external-link-alt"></span>
+                            Nueva Unidad de Medida
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    Aún no hay unidades de medida en el sistema
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock page_content %}
+
+{% block js %}
+    <script src="{% static 'js/table.js' %}"></script>
+{% endblock js %}
