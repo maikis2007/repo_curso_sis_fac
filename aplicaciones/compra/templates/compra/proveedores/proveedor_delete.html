@@ -1,6 +1,6 @@
 <div class="modal-dialog">
     <div class="modal-content">
-        <form action="{% url 'inventario:subcategoria_delete' subcategoria.id %}" method="POST">
+        <form action="{% url 'cmp:proveedor_delete' proveedor.id %}" method="POST">
             {% csrf_token %}
             <div class="col-xl-12 col-md-12 mb-12">
                 <div class="card border-left-danger shadow h-100 py-2">
@@ -8,7 +8,7 @@
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                    ¿Desea eliminar {{ subcategoria.descripcion }}?
+                                    ¿Desea eliminar {{ proveedor.descripcion }}?
                                 </div>
                                 <button type="submit" class="btn btn-danger">
                                     <span class="fa fa-save"></span>

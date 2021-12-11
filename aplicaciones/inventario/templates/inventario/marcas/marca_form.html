@@ -4,7 +4,7 @@
 
 {% block catalogos %} active {% endblock catalogos %}
 
-{% block inventario %} show {% endblock inventario %}
+{% block aplicacion %} show {% endblock aplicacion %}
 
 {% block marca %} active {% endblock marca %}
 
@@ -32,10 +32,7 @@
                             </div>
                             {% endif %}
                             <div class="row">
-                                <div class="col-4">
-                                    {{ form.nombre }}
-                                </div>
-                                <div class="col-6">
+                                <div class="col-10">
                                     <div class="input-group">
                                         {{ form.descripcion }}
                                     </div>

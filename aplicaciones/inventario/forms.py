@@ -7,13 +7,10 @@ from aplicaciones.inventario.models import *
 class CategoriaForm(forms.ModelForm):
     class Meta:
         model = Categoria
-        fields = ['nombre', 'descripcion', 'estado']
+        fields = ['descripcion', 'estado']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs.update({
-            'placeholder': 'Nombre de la Categoría'
-        })
         self.fields['descripcion'].widget.attrs.update({
             'placeholder': 'Descripción de la Categoría'
         })
@@ -29,13 +26,10 @@ class SubCategoriaForm(forms.ModelForm):
 
     class Meta:
         model = SubCategoria
-        fields = ['categoria', 'nombre', 'descripcion', 'estado']
+        fields = ['categoria', 'descripcion', 'estado']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs.update({
-            'placeholder': 'Nombre de la SubCategoría'
-        })
         self.fields['descripcion'].widget.attrs.update({
             'placeholder': 'Descripción de la SubCategoría'
         })
@@ -48,13 +42,10 @@ class SubCategoriaForm(forms.ModelForm):
 class MarcaForm(forms.ModelForm):
     class Meta:
         model = Marca
-        fields = ['nombre', 'descripcion', 'estado']
+        fields = ['descripcion', 'estado']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs.update({
-            'placeholder': 'Nombre de la Marca'
-        })
         self.fields['descripcion'].widget.attrs.update({
             'placeholder': 'Descripción de la Marca'
         })
@@ -66,13 +57,10 @@ class MarcaForm(forms.ModelForm):
 class UMForm(forms.ModelForm):
     class Meta:
         model = UnidadMedida
-        fields = ['nombre', 'descripcion', 'estado']
+        fields = ['descripcion', 'estado']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['nombre'].widget.attrs.update({
-            'placeholder': 'Nombre de la Unidad de Medida'
-        })
         self.fields['descripcion'].widget.attrs.update({
             'placeholder': 'Descripción de la Unidad de Medida'
         })
@@ -84,7 +72,7 @@ class UMForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        exclude = ['fc', 'fm', 'uc', 'um'] # los que no esten excluidos, están incluidos
+        fields = ['codigo', 'codigo_barra', 'descripcion', 'estado', 'precioc', 'preciov', 'existencia', 'ultima_compra', 'marca', 'subcategoria', 'unidad_medida']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

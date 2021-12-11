@@ -4,7 +4,7 @@
 
 {% block catalogos %} active {% endblock catalogos %}
 
-{% block inventario %} show {% endblock inventario %}
+{% block aplicacion %} show {% endblock aplicacion %}
 
 {% block subcategoria %} active {% endblock subcategoria %}
 
@@ -36,7 +36,6 @@
                                         <th>Id</th>
                                         <th>Categoría</th>
                                         <th>SubCategoría</th>
-                                        <th>Descripción</th>
                                         <th>Estado</th>
                                         <th>F. Creación</th>
                                         <th>F. Modificación</th>
@@ -47,8 +46,7 @@
                                         <tr>
                                             <td>{{ item.id }}</td>
                                             <td>{{ item.categoria|upper }}</td>
-                                            <td>{{ item.nombre|upper }}</td>
-                                            <td>{{ item.descripcion }}</td>
+                                            <td>{{ item.descripcion|upper }}</td>
                                             <td>{{ item.estado|yesno:"Activa, Inactiva" }}</td>
                                             <td>{{ item.fc|date:"d/m/Y H:i:s" }}</td>
                                             <td>{{ item.fm|date:"d/m/Y H:i:s" }}</td>
@@ -131,7 +129,6 @@
                                         <th>Id</th>
                                         <th>Categoría</th>
                                         <th>SubCategoría</th>
-                                        <th>Descripción</th>
                                         <th>Estado</th>
                                         <th>F. Creación</th>
                                         <th>F. Modificación</th>
@@ -142,8 +139,7 @@
                                         <tr>
                                             <td>{{ item.id }}</td>
                                             <td>{{ item.categoria|upper }}</td>
-                                            <td>{{ item.nombre|upper }}</td>
-                                            <td>{{ item.descripcion }}</td>
+                                            <td>{{ item.descripcion|upper }}</td>
                                             <td>{{ item.estado|yesno:"Activa, Inactiva" }}</td>
                                             <td>{{ item.fc|date:"d/m/Y H:i:s" }}</td>
                                             <td>{{ item.fm|date:"d/m/Y H:i:s" }}</td>

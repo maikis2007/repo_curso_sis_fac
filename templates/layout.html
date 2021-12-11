@@ -76,7 +76,7 @@
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Catálogos</span>
                 </a>
-                <div id="collapseTwo" class="collapse {% block inventario %} {% endblock inventario %}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseTwo" class="collapse {% block aplicacion %} {% endblock aplicacion %}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Inventario</h6>
                         <a class="collapse-item {% block categoria %} {% endblock categoria %}" href="{% url 'inv:categorias' %}">Categorías</a>
@@ -84,6 +84,8 @@
                         <a class="collapse-item {% block marca %} {% endblock marca %}" href="{% url 'inv:marcas' %}">Marcas</a>
                         <a class="collapse-item {% block um %} {% endblock um %}" href="{% url 'inv:um' %}">Unidades de Medida</a>
                         <a class="collapse-item {% block producto %} {% endblock producto %}" href="{% url 'inv:productos' %}">Productos</a>
+                        <h6 class="collapse-header">Compra</h6>
+                        <a class="collapse-item {% block proveedor %} {% endblock proveedor %}" href="{% url 'cmp:proveedores' %}">Proveedores</a>
                     </div>
                 </div>
             </li>
@@ -293,7 +295,7 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ user.username|capfirst }}</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ user.username | capfirst }}</span>
                                 <img class="img-profile rounded-circle" src="{% static 'img/undraw_profile.svg' %}">
                             </a>
                             <!-- Dropdown - User Information -->

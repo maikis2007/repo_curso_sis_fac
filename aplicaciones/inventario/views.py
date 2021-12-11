@@ -45,30 +45,9 @@ class CategoriaDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 # Todo sucede a partir de un click en el botón de inactivar categoría
 def categoria_estado(request, id): # categoria inactiva, subcategorias y productos inactivos, y viceversa
-    categoria = Categoria.objects.filter(pk=id).first()
+    categoria = Categoria.objects.filter(pk=id).first() # categoria a inactivar o activar
 
-    subcategorias = SubCategoria.objects.filter(categoria=id).all()
-
-    # Se van a filtrar todos los productos de cada subcategoria correspondiente a la categoria
-
-    # 1re paso: Obtengo el id de cada subcategoria
-
-    # 2do paso: Con esos id's hago las consultas a Producto
-
-    # print(lista2) si hay x subcategorias, va a haber x qs, cada qs tiene cierta cantidad de registros
-
-    # 3er paso: Guardar todo en una lista
-
-    # 4to paso: Recorrear con un bucle esa lista, y al queryset recorrelo también, más de una vez
-
-    """
-    for qs in lista2:
-        for producto in qs:
-            producto.estado = False
-    """
-
-    # 5to paso: Cambiar el estado de cada producto respectivo
-
+    subcategorias = SubCategoria.objects.filter(categoria=id).all() # subcategorias de la categoria
 
     if not categoria:
         return redirect('inv:categorias')
@@ -77,22 +56,23 @@ def categoria_estado(request, id): # categoria inactiva, subcategorias y product
 
         for subcategoria in subcategorias:
             id = subcategoria.pk
-            lista.append(id)
+            lista.append(id) # lista guarda los id's de las subcategorias
         
         lista2 = []
 
         for id in lista:
-            producto = Producto.objects.filter(subcategoria=id).all()
-            lista2.append(producto)
+            producto = Producto.objects.filter(subcategoria=id).all() # se obtiene los productos de cada subcategoria en un "qs"
+            lista2.append(producto) # cada qs se guarda en una lista
 
+        # Se cambia el estado al hacer click
         if categoria.estado:
             categoria.estado = False
 
-            if subcategorias:
+            if subcategorias: # Para sus subcategorias
                 for subcategoria in subcategorias:
                     subcategoria.estado = False # Inactivada
                     subcategoria.save()
-            if lista2:
+            if lista2: # y sus productos
                 for qs in lista2:
                     for producto in qs:
                         producto.estado = False
@@ -110,8 +90,10 @@ def categoria_estado(request, id): # categoria inactiva, subcategorias y product
                     for producto in qs:
                         producto.estado = True
                         producto.save()
-        
-        categoria.save()
+            # Porque con subcategoria es uno a muchos
+            # Y subcategoría hace uno a muchos con Producto
+
+        categoria.save() # Guardar cambios, siempre
 
         return redirect('inv:categorias')
 
@@ -126,7 +108,7 @@ def subcategoria_list(request): # Implementación de una lógica especial en el 
 
     context = {'categorias': categorias, 'cantidad_categorias': cantidad_categorias, 'cantidad_categorias_inactivas': cantidad_categorias_inactivas, 'subcategorias': subcategorias}
 
-    template = 'inventario/subcategorias/subcategorias.html'
+    template = 'inventario/subcategorias/subcategorias.html' # La lógica se observa en la plantilla
 
     return render(request, template, context)
 
@@ -169,6 +151,9 @@ def subcategoria_estado(request, id): # subcategoria inactiva, productos inactiv
     if not subcategoria:
         return redirect('inv:subcategorias')
     else:
+        # Se hace la operación contraria, solo si lo necesita
+        # (No voy a inactivar, el registro que ya está inactivo, XD)
+        # Es otra forma, más "lógica" de hacerlo
         if subcategoria.estado:
             subcategoria.estado = False
 
@@ -344,7 +329,7 @@ def producto_list(request): # Implementación de una lógica más avanzada en el
 
     context = {'subcategorias': subcategorias, 'marcas': marcas, 'unidades_medida': unidades_medida, 'cantidad_subcategorias': cantidad_subcategorias, 'cantidad_subcategorias_inactivas': cantidad_subcategorias_inactivas, 'cantidad_marcas': cantidad_marcas, 'cantidad_marcas_inactivas': cantidad_marcas_inactivas,  'cantidad_um': cantidad_um, 'cantidad_um_inactivas': cantidad_um_inactivas, 'productos': productos}
 
-    template = 'inventario/productos/productos.html'
+    template = 'inventario/productos/productos.html' # La lógica es similar a subcategoria_list
 
     return render(request, template, context)
 
@@ -379,7 +364,7 @@ class ProductoDeleteView(LoginRequiredMixin, generic.DeleteView):
     success_url = reverse_lazy("inv:productos")
     login_url = "bases:login"
 
-def producto_estado(request, id):
+def producto_estado(request, id): # producto es una tabla débil, depende de otras, por eso su inactivar es simple.
     producto = Producto.objects.filter(pk=id).first()
 
     if not producto:
@@ -392,4 +377,3 @@ def producto_estado(request, id):
         
         producto.save()
         return redirect('inv:productos')
-

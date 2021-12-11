@@ -19,19 +19,9 @@ class Migration(migrations.Migration):
             field=models.CharField(help_text='Descripción de la Categoría', max_length=250, unique=True),
         ),
         migrations.AlterField(
-            model_name='categoria',
-            name='nombre',
-            field=models.CharField(help_text='Nombre de la Categoría', max_length=50, unique=True),
-        ),
-        migrations.AlterField(
             model_name='subcategoria',
             name='descripcion',
             field=models.CharField(help_text='Descripción de la SubCategoría', max_length=250),
-        ),
-        migrations.AlterField(
-            model_name='subcategoria',
-            name='nombre',
-            field=models.CharField(help_text='Nombre de la SubCategoría', max_length=50),
         ),
         migrations.CreateModel(
             name='UnidadMedida',
@@ -41,7 +31,6 @@ class Migration(migrations.Migration):
                 ('fc', models.DateTimeField(auto_now_add=True)),
                 ('fm', models.DateTimeField(auto_now=True)),
                 ('um', models.IntegerField(blank=True, null=True)),
-                ('nombre', models.CharField(help_text='Nombre de la Unidad de Medida', max_length=50, unique=True)),
                 ('descripcion', models.CharField(help_text='Descripción de la Unidad de Medida', max_length=250, unique=True)),
                 ('uc', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],

@@ -4,7 +4,7 @@
 
 {% block catalogos %} active {% endblock catalogos %}
 
-{% block inventario %} show {% endblock inventario %}
+{% block aplicacion %} show {% endblock aplicacion %}
 
 {% block producto %} active {% endblock producto %}
 
@@ -34,7 +34,7 @@
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <th>Id</th>
-                                        <th>Sub.Cat.</th>
+                                        <th>Subcategoría</th>
                                         <th>Marca</th>
                                         <th>U.M.</th>
                                         <th>Código</th>
@@ -55,7 +55,7 @@
                                                 <td>{{ item.codigo_barra }}</td>
                                                 <td>{{ item.descripcion|upper }}</td>
                                                 <td>{{ item.existencia }}</td>
-                                                <td>{{item.estado|yesno:"Activo, Inactivo"}}</td>
+                                                <td>{{ item.estado|yesno:"Activo, Inactivo" }}</td>
                                                 <td>
                                                     <!-- Si el estado de la categoría está inactivo-->
                                                     <a class="btn btn-warning btn-circle inhabilitado">
@@ -115,7 +115,7 @@
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <th>Id</th>
-                                        <th>Sub.Cat.</th>
+                                        <th>Subcategoría</th>
                                         <th>Marca</th>
                                         <th>U.M.</th>     
                                         <th>Código</th>
@@ -136,7 +136,7 @@
                                                 <td>{{ item.codigo_barra }}</td>
                                                 <td>{{ item.descripcion|upper }}</td>
                                                 <td>{{ item.existencia }}</td>
-                                                <td>{{item.estado|yesno:"Activo, Inactivo"}}</td>
+                                                <td>{{ item.estado|yesno:"Activo, Inactivo" }}</td>
                                                 <td>
                                                     <!-- Si el estado de la categoría está inactivo-->
                                                     <a onclick="return abrir_modal('{% url 'inv:producto_edit' item.id %}')" class="btn btn-warning btn-circle">

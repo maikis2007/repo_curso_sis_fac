@@ -21,4 +21,5 @@ urlpatterns = [
     # Llamamos a las urls de las aplicaciones desde aquí
     path('', include("aplicaciones.bases.urls", namespace="bases") ),
     path('inv/', include("aplicaciones.inventario.urls", namespace="inv") ),
+    path('cmp/', include("aplicaciones.compra.urls", namespace="cmp") ),
 ]

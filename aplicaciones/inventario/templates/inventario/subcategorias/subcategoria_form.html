@@ -4,7 +4,7 @@
 
 {% block catalogos %} active {% endblock catalogos %}
 
-{% block inventario %} show {% endblock inventario %}
+{% block aplicacion %} show {% endblock aplicacion %}
 
 {% block subcategoria %} active {% endblock subcategoria %}
 
@@ -32,14 +32,9 @@
                             </div>
                             {% endif %}
                             <div class="row">
-                                <div class="col-3">
+                                <div class="col-5">
                                     <div class="input-group">
                                         {{ form.categoria }}
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    <div class="input-group">
-                                        {{ form.nombre }}
                                     </div>
                                 </div>
                                 <div class="col-5">
@@ -47,7 +42,7 @@
                                         {{ form.descripcion }}
                                     </div>
                                 </div>
-                                <div class="col-1">
+                                <div class="col-2">
                                     <div class="form-group">
                                         {{ form.estado }}
                                     </div>

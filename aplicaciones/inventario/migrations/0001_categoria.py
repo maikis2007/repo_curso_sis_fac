@@ -22,7 +22,6 @@ class Migration(migrations.Migration):
                 ('fc', models.DateTimeField(auto_now_add=True)),
                 ('fm', models.DateTimeField(auto_now=True)),
                 ('um', models.IntegerField(blank=True, null=True)),
-                ('nombre', models.CharField(max_length=50, unique=True)),
                 ('descripcion', models.CharField(max_length=250, unique=True)),
                 ('uc', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
