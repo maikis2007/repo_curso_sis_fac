@@ -31,7 +31,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <th>Id</th>
                                         <th>Categoría</th>
@@ -51,31 +51,12 @@
                                             <td>{{ item.fc|date:"d/m/Y H:i:s" }}</td>
                                             <td>{{ item.fm|date:"d/m/Y H:i:s" }}</td>
                                             <td>
-                                                <!-- Si el estado de la categoría está activo-->
-                                                {% if item.categoria.estado %}
-                                                <a href="{% url 'inv:subcategoria_edit' item.id %}" class="btn btn-warning btn-circle">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a href="{% url 'inv:subcategoria_estado' item.id %}" class="btn btn-dark btn-circle">
-                                                    {% if item.estado %}
-                                                    <i class="fas fa-thumbs-down"></i>
-                                                    {% else %}
-                                                    <i class="fas fa-thumbs-up"></i>
-                                                    {% endif %}
-                                                </a>
-                                                <!-- Si el estado de la categoría está inactivo-->
-                                                {% else %}
                                                 <a class="btn btn-warning btn-circle inhabilitado">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <a class="btn btn-dark btn-circle inhabilitado">
-                                                    {% if item.estado %}
-                                                    <i class="fas fa-thumbs-down"></i>
-                                                    {% else %}
                                                     <i class="fas fa-thumbs-up"></i>
-                                                    {% endif %}
                                                 </a>
-                                                {% endif %}
                                                 <a onclick="return abrir_modal('{% url 'inv:subcategoria_delete' item.id %}')" class="btn btn-danger btn-circle">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
@@ -124,7 +105,7 @@
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <th>Id</th>
                                         <th>Categoría</th>
@@ -145,11 +126,11 @@
                                             <td>{{ item.fm|date:"d/m/Y H:i:s" }}</td>
                                             <td>
                                                 <!-- Si el estado de la categoría está activo-->
-                                                {% if item.categoria.estado %}
+                                                {% if item.categoria.estado == True %}
                                                 <a href="{% url 'inv:subcategoria_edit' item.id %}" class="btn btn-warning btn-circle">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <a href="{% url 'inv:subcategoria_estado' item.id %}" class="btn btn-dark btn-circle">
+                                                <a onclick="return abrir_modal('{% url 'inv:subcategoria_estado' item.id %}')" class="btn btn-dark btn-circle">
                                                     {% if item.estado %}
                                                     <i class="fas fa-thumbs-down"></i>
                                                     {% else %}
@@ -162,11 +143,7 @@
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <a class="btn btn-dark btn-circle inhabilitado">
-                                                    {% if item.estado %}
-                                                    <i class="fas fa-thumbs-down"></i>
-                                                    {% else %}
                                                     <i class="fas fa-thumbs-up"></i>
-                                                    {% endif %}
                                                 </a>
                                                 {% endif %}
                                                 <a onclick="return abrir_modal('{% url 'inv:subcategoria_delete' item.id %}')" class="btn btn-danger btn-circle">

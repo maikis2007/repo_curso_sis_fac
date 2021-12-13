@@ -1,6 +1,7 @@
 from re import template
 from django.db.models import query
-from django.shortcuts import redirect, render
+from django.http import response
+from django.shortcuts import redirect, render, HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import generic
 from django.urls import reverse_lazy
@@ -48,14 +49,28 @@ class ProveedorDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 def proveedor_estado(request, id):
     proveedor = Proveedor.objects.filter(pk=id).first()
+    contexto = {}
+    template = "compra/proveedores/proveedor_estado.html"
 
     if not proveedor:
         return redirect("cmp:proveedores")
     else:
-        if proveedor.estado:
-            proveedor.estado = False
-        else:
-            proveedor.estado = True
-        
-        proveedor.save()
-        return redirect('cmp:proveedores')
+        if request.method == 'GET':
+            contexto = {'proveedor': proveedor}
+
+        elif request.method == 'POST':
+            if proveedor.estado:
+                proveedor.estado = False
+            else:
+                proveedor.estado = True
+
+            proveedor.save()
+
+            contexto = {'proveedor': 'OK'}
+
+            if not proveedor.estado:
+                return HttpResponse('Proveedor inactivado')
+            else:
+                return HttpResponse('Proveedor activado')
+
+    return render(request, template, contexto)

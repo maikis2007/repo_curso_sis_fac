@@ -28,9 +28,15 @@
     <link rel="preload" href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" as="style">
     <link href="{% static 'vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
 
+    <!-- Datatable Responsive CSS -->
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
+
     <!-- My styles -->
     <link rel="preload" href="{% static 'css/style.css' %}" as="style">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'vendor/jquery-confirm/jquery-confirm.min.css' %}">
 
 </head>
 
@@ -408,6 +414,9 @@
 
     <!-- Modal -->
     <script src="{% static 'js/modal.js' %}"></script>
+
+    <!-- Jquery Confirm -->
+    <script src="{% static 'vendor/jquery-confirm/jquery-confirm.min.js' %}"></script>
 
     {% block js %} {% endblock js %}
 

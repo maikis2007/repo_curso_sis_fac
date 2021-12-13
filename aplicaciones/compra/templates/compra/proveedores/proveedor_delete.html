@@ -8,9 +8,9 @@
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                    ¿Desea eliminar {{ proveedor.descripcion }}?
+                                    ¿Desea eliminar <strong>{{ proveedor.descripcion }}</strong>?
                                 </div>
-                                <button type="submit" class="btn btn-danger">
+                                <button type="button" class="btn btn-danger" id="btnEliminar">
                                     <span class="fa fa-save"></span>
                                     Eliminar
                                 </button>
@@ -29,3 +29,49 @@
         </form>
     </div>
 </div>
+
+<script>
+    $(document).ready(function(){
+
+        var token = $('input[name=csrfmiddlewaretoken]').val();
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    xhr.setRequestHeader("X-CSRFToken", token);
+                }
+            }
+        });
+
+        $("#btnEliminar").click(function(e){
+
+            e.preventDefault(); // Desactivar el envío permanentemente
+            //alert("Probando");
+            
+            var id = {{ proveedor.id }};
+            var url = "{% url 'cmp:proveedor_delete' proveedor.id %}";
+            var data = {"id": id};
+            data = JSON.stringify(data); // {"id": id}
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: data,
+                beforeSend: function(xhr,settings){
+                    $.ajaxSettings.beforeSend(xhr,settings);
+                },
+                success: function(response){ /* recibe la respuesta de la vista */
+                    alert('Proveedor eliminado');
+                    console.log('Proveedor eliminado');
+                    cerrar_modal();
+                    location.reload();
+                },
+                error: function(jqXHR, textStatus, errorThrow){
+                    console.log(textStatus, errorThrow);
+                }
+            })
+
+        });
+
+    });
+</script>

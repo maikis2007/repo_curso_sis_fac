@@ -1,20 +1,29 @@
 <div class="modal-dialog">
     <div class="modal-content">
-        <form action="{% url 'inv:producto_delete' producto.id %}" method="POST">
+        <form action="{% url 'inv:categoria_estado' categoria.id %}" method="POST">
             {% csrf_token %}
             <div class="col-xl-12 col-md-12 mb-12">
                 <div class="card border-left-danger shadow h-100 py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                    ¿Desea eliminar <strong>{{ producto.descripcion }}</strong>?
+                                <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
+                                    {% if categoria.estado == True %}
+                                        ¿Desea inactivar 
+                                    {% else %}
+                                        ¿Desea activar
+                                    {% endif %}
+                                    <strong>{{ categoria.descripcion }}</strong>?
                                 </div>
-                                <button type="button" class="btn btn-danger" id="btnEliminar">
+                                <button type="button" class="btn {% if categoria.estado == True %} btn-danger {% else %} btn-success {% endif %}" id="btnInactivar">
                                     <span class="fa fa-save"></span>
-                                    Eliminar
+                                    {% if categoria.estado == True %}
+                                        Inactivar
+                                    {% else %}
+                                        Activar
+                                    {% endif %}
                                 </button>
-                                <button type="button" class="btn btn-success" onclick="return cerrar_modal()">
+                                <button type="button" class="btn {% if categoria.estado == True %} btn-success {% else %} btn-danger {% endif %}" onclick="return cerrar_modal()">
                                     <span class="fa fa-undo"></span>
                                     Cancelar
                                 </button>
@@ -43,13 +52,13 @@
             }
         });
 
-        $("#btnEliminar").click(function(e){
+        $("#btnInactivar").click(function(e){
 
             e.preventDefault(); // Desactivar el envío permanentemente
             //alert("Probando");
             
-            var id = {{ producto.id }};
-            var url = "{% url 'inv:producto_delete' producto.id %}";
+            var id = {{ categoria.id }};
+            var url = "{% url 'inv:categoria_estado' categoria.id %}";
             var data = {"id": id};
             data = JSON.stringify(data); // {"id": id}
 
@@ -61,8 +70,8 @@
                     $.ajaxSettings.beforeSend(xhr,settings);
                 },
                 success: function(response){ /* recibe la respuesta de la vista */
-                    alert('Producto eliminado');
-                    console.log('Producto eliminado');
+                    alert(response);
+                    console.log(response);
                     cerrar_modal();
                     location.reload()
                 },

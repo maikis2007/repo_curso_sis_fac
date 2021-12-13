@@ -1,6 +1,7 @@
 from re import template
+from typing import Generator
 from django.db.models import query
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import generic
 from django.urls import reverse_lazy
@@ -49,53 +50,70 @@ def categoria_estado(request, id): # categoria inactiva, subcategorias y product
 
     subcategorias = SubCategoria.objects.filter(categoria=id).all() # subcategorias de la categoria
 
+    contexto = {}
+    template = "inventario/categorias/categoria_estado.html"
+
     if not categoria:
         return redirect('inv:categorias')
     else:
-        lista = []
+        if request.method == 'GET':
+            contexto = {'categoria': categoria}
+        elif request.method == 'POST':
+            lista = []
 
-        for subcategoria in subcategorias:
-            id = subcategoria.pk
-            lista.append(id) # lista guarda los id's de las subcategorias
-        
-        lista2 = []
+            for subcategoria in subcategorias:
+                id = subcategoria.pk
+                lista.append(id) # lista guarda los id's de las subcategorias
+            
+            lista2 = []
 
-        for id in lista:
-            producto = Producto.objects.filter(subcategoria=id).all() # se obtiene los productos de cada subcategoria en un "qs"
-            lista2.append(producto) # cada qs se guarda en una lista
+            for id in lista:
+                producto = Producto.objects.filter(subcategoria=id).all() # se obtiene los productos de cada subcategoria en un "qs"
+                lista2.append(producto) # cada qs se guarda en una lista
 
-        # Se cambia el estado al hacer click
-        if categoria.estado:
-            categoria.estado = False
+            # Se cambia el estado al hacer click
+            if categoria.estado:
+                categoria.estado = False
 
-            if subcategorias: # Para sus subcategorias
-                for subcategoria in subcategorias:
-                    subcategoria.estado = False # Inactivada
-                    subcategoria.save()
-            if lista2: # y sus productos
-                for qs in lista2:
-                    for producto in qs:
-                        producto.estado = False
-                        producto.save()
+                if subcategorias: # Para sus subcategorias
+                    for subcategoria in subcategorias:
+                        subcategoria.estado = False # Inactivada
+                        subcategoria.save()
+                if lista2: # y sus productos
+                    for qs in lista2:
+                        for producto in qs:
+                            producto.estado = False
+                            producto.save()
 
-        else:
-            categoria.estado = True
+            else:
+                categoria.estado = True
 
-            if subcategorias:
-                for subcategoria in subcategorias:
-                    subcategoria.estado = True # Activada
-                    subcategoria.save()
-            if lista2:
-                for qs in lista2:
-                    for producto in qs:
-                        producto.estado = True
-                        producto.save()
-            # Porque con subcategoria es uno a muchos
-            # Y subcategoría hace uno a muchos con Producto
+                if subcategorias:
+                    for subcategoria in subcategorias:
+                        subcategoria.estado = True # Activada
+                        subcategoria.save()
+                if lista2:
+                    for qs in lista2:
+                        for producto in qs:
+                            producto.estado = True
+                            producto.save()
+                # Porque con subcategoria es uno a muchos
+                # Y subcategoría hace uno a muchos con Producto
 
-        categoria.save() # Guardar cambios, siempre
+            categoria.save() # Guardar cambios, siempre
 
-        return redirect('inv:categorias')
+            
+            contexto = {'categoria': 'OK'}
+
+            if not categoria.estado:
+
+                return HttpResponse('Categoría inactivada')
+
+            else:
+
+                return HttpResponse('Categoría activada')
+
+    return render(request, template, contexto)
 
 def subcategoria_list(request): # Implementación de una lógica especial en el listado de las subcategorias, permisos de usuario
     subcategorias = SubCategoria.objects.all()
@@ -147,32 +165,49 @@ def subcategoria_estado(request, id): # subcategoria inactiva, productos inactiv
 
     productos_activos = Producto.objects.filter(subcategoria=id, estado=True).all()
     productos_inactivos = Producto.objects.filter(subcategoria=id, estado=False).all()
-    
+
+    contexto = {}
+
+    template = "inventario/subcategorias/subcategoria_estado.html"
+
     if not subcategoria:
         return redirect('inv:subcategorias')
     else:
-        # Se hace la operación contraria, solo si lo necesita
-        # (No voy a inactivar, el registro que ya está inactivo, XD)
-        # Es otra forma, más "lógica" de hacerlo
-        if subcategoria.estado:
-            subcategoria.estado = False
+        if request.method == 'GET':
+            contexto = {'subcategoria': subcategoria}
+        elif request.method == 'POST':
+            # Se hace la operación contraria, solo si lo necesita
+            # (No voy a inactivar, el registro que ya está inactivo, XD)
+            # Es otra forma, más "lógica" de hacerlo
+            if subcategoria.estado:
+                subcategoria.estado = False
 
-            if productos_activos:
-                for producto in productos_activos:
-                    producto.estado = False
-                    producto.save()
+                if productos_activos:
+                    for producto in productos_activos:
+                        producto.estado = False
+                        producto.save()
 
-        else:
-            subcategoria.estado = True
+            else:
+                subcategoria.estado = True
 
-            if productos_inactivos:
-                for producto in productos_inactivos:
-                    producto.estado = True
-                    producto.save()
-        
-        subcategoria.save()
+                if productos_inactivos:
+                    for producto in productos_inactivos:
+                        producto.estado = True
+                        producto.save()
+            
+            subcategoria.save()
 
-        return redirect('inv:subcategorias')
+            contexto = {'subcategoria': 'OK'}
+
+            if not subcategoria.estado:
+
+                return HttpResponse('Subcategoría inactivada')
+
+            else:
+
+                return HttpResponse('Subcategoría activada')
+
+    return render(request, template, contexto)
 
 class MarcaListView(LoginRequiredMixin, generic.ListView):
     model = Marca
@@ -200,10 +235,6 @@ class MarcaUpdateView(LoginRequiredMixin, generic.UpdateView):
     success_url = reverse_lazy("inv:marcas")
     login_url = "bases:login"
 
-    def form_valid(self, form):
-        form.instance.um = self.request.user.id
-        return super().form_valid(form)
-
 class MarcaDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Marca
     template_name = "inventario/marcas/marca_delete.html"
@@ -216,29 +247,46 @@ def marca_estado(request, id): # marca inactiva, productos inactivos, y vicevers
 
     productos_activos = Producto.objects.filter(marca=id, estado=True).all()
     productos_inactivos = Producto.objects.filter(marca=id, estado=False).all()
+
+    contexto = {}
+
+    template = "inventario/marcas/marca_estado.html"
     
     if not marca:
         return redirect('inv:marcas')
     else:
-        if marca.estado:
-            marca.estado = False
+        if request.method == 'GET':
+            contexto = {'marca': marca}
+        elif request.method == 'POST':
+            if marca.estado:
+                marca.estado = False
 
-            if productos_activos:
-                for producto in productos_activos:
-                    producto.estado = False
-                    producto.save()
+                if productos_activos:
+                    for producto in productos_activos:
+                        producto.estado = False
+                        producto.save()
 
-        else:
-            marca.estado = True
+            else:
+                marca.estado = True
 
-            if productos_inactivos:
-                for producto in productos_inactivos:
-                    producto.estado = True
-                    producto.save()
-        
-        marca.save()
+                if productos_inactivos:
+                    for producto in productos_inactivos:
+                        producto.estado = True
+                        producto.save()
+            
+            marca.save()
 
-        return redirect('inv:marcas')
+            contexto = {'marca': 'OK'}
+
+            if not marca.estado:
+
+                return HttpResponse('Marca inactivada')
+
+            else:
+
+                return HttpResponse('Marca activada')
+    
+    return render(request, template, contexto)
 
 class UMListView(LoginRequiredMixin, generic.ListView):
     model = UnidadMedida
@@ -283,28 +331,45 @@ def um_estado(request, id): # unidad de medida inactiva, productos inactivos, y 
     productos_activos = Producto.objects.filter(unidad_medida=id, estado=True).all()
     productos_inactivos = Producto.objects.filter(unidad_medida=id, estado=False).all()
     
+    contexto = {}
+
+    template = "inventario/unidades_medida/um_estado.html"
+
     if not um:
-        return redirect('inv:ums')
-    else:
-        if um.estado:
-            um.estado = False
-
-            if productos_activos:
-                for producto in productos_activos:
-                    producto.estado = False
-                    producto.save()
-
-        else:
-            um.estado = True
-
-            if productos_inactivos:
-                for producto in productos_inactivos:
-                    producto.estado = True
-                    producto.save()
-        
-        um.save()
-
         return redirect('inv:um')
+    else:
+        if request.method == 'GET':
+            contexto = {'um': um}
+        elif request.method == 'POST':
+            if um.estado:
+                um.estado = False
+
+                if productos_activos:
+                    for producto in productos_activos:
+                        producto.estado = False
+                        producto.save()
+
+            else:
+                um.estado = True
+
+                if productos_inactivos:
+                    for producto in productos_inactivos:
+                        producto.estado = True
+                        producto.save()
+            
+            um.save()
+
+            contexto = {'um': 'OK'}
+
+            if not um.estado:
+
+                return HttpResponse('Unidad de Medida inactivada')
+
+            else:
+
+                return HttpResponse('Unidad de Medida activada')
+
+    return render(request, template, contexto)
 
 def producto_list(request): # Implementación de una lógica más avanzada en el listado de los productos, permisos de usuario
     productos = Producto.objects.all()
@@ -367,13 +432,31 @@ class ProductoDeleteView(LoginRequiredMixin, generic.DeleteView):
 def producto_estado(request, id): # producto es una tabla débil, depende de otras, por eso su inactivar es simple.
     producto = Producto.objects.filter(pk=id).first()
 
+    contexto = {}
+
+    template = "inventario/productos/producto_estado.html"
+
     if not producto:
-        return redirect("inv:productos")
-    else:
-        if producto.estado:
-            producto.estado = False
-        else:
-            producto.estado = True
-        
-        producto.save()
         return redirect('inv:productos')
+    else:
+        if request.method == 'GET':
+            contexto = {'producto': producto}
+        elif request.method == 'POST':
+            if producto.estado:
+                producto.estado = False
+            else:
+                producto.estado = True
+            
+            producto.save()
+
+            contexto = {'producto': 'OK'}
+
+            if not producto.estado:
+
+                return HttpResponse('Producto inactivado')
+
+            else:
+
+                return HttpResponse('Producto activado')
+
+    return render(request, template, contexto)

@@ -26,7 +26,7 @@ urlpatterns = [
     path('unidades_medida/', UMListView.as_view(), name="um"),
     path('nueva/unidad_medida/', UMCreateView.as_view(), name="um_new"),
     path('editar/unidad_medida/<int:pk>', UMUpdateView.as_view(), name="um_edit"),
-    path('eliminar/unidad_medida/<int:pk>', UMDeleteView.as_view(), name="um_delete"),
+    path('eliminar/unidad_medida/<int:pk>', UMDeleteView.as_view, name="um_delete"),
     path('cambiar/estado/unidad_medida/<int:id>', um_estado, name="um_estado"),
 
     path('productos/', producto_list, name="productos"),
