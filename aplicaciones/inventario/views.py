@@ -1,197 +1,260 @@
-from re import template
-from typing import Generator
-from django.db.models import query
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required, permission_required
+
+from django.contrib.messages.api import success
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
+
 from django.shortcuts import redirect, render, HttpResponse
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views import generic
 from django.urls import reverse_lazy
-from aplicaciones.inventario.models import *
-from aplicaciones.inventario.forms import *
 
-class CategoriaListView(LoginRequiredMixin, generic.ListView):
+from django.views.generic import ListView, CreateView
+
+from .models import Categoria, SubCategoria, Marca, UnidadMedida, Producto
+from .forms import CategoriaForm, SubCategoriaForm, MarcaForm, UMForm, ProductoForm
+
+from aplicaciones.bases.views import SinPrivilegios
+
+# Create your views here.
+
+class CategoriaListView(SinPrivilegios, \
+    ListView):
+    permission_required = "inventario.view_categoria"
     model = Categoria
-    template_name = "inventario/categorias/categorias.html"
+    template_name = "inventario/categorias.html"
     context_object_name = "categorias"
-    login_url = "bases:login"
 
-class CategoriaCreateView(LoginRequiredMixin, generic.CreateView):
+class CategoriaCreateView(SuccessMessageMixin, SinPrivilegios, \
+    CreateView):
+    permission_required = "inventario.add_categoria"
     model = Categoria
-    template_name = "inventario/categorias/categoria_form.html"
+    template_name = "inventario/categoria_form.html"
     context_object_name = "categoria"
     form_class = CategoriaForm
     success_url = reverse_lazy("inv:categorias")
-    login_url = "bases:login"
+    success_message = "Categoría Creada Satisfactoriamente"
 
     def form_valid(self, form):
         form.instance.uc = self.request.user
         return super().form_valid(form)
 
-class CategoriaUpdateView(LoginRequiredMixin, generic.UpdateView):
-    model = Categoria
-    template_name = "inventario/categorias/categoria_form.html"
-    context_object_name = "categoria"
-    form_class = CategoriaForm
-    success_url = reverse_lazy("inv:categorias")
-    login_url = "bases:login"
+@login_required(login_url='bases:login')
+@permission_required('inventario.change_categoria', login_url='bases:sin_privilegios')
+def categoria_edit(request, id_categoria):
+    categoria = Categoria.objects.get(id=id_categoria)
+    template = "inventario/categoria_form.html"
 
-    def form_valid(self, form):
-        form.instance.um = self.request.user.id
-        return super().form_valid(form)
+    if request.method == 'GET':
+        form = CategoriaForm(instance=categoria)
 
-class CategoriaDeleteView(LoginRequiredMixin, generic.DeleteView):
-    model = Categoria
-    template_name = "inventario/categorias/categoria_delete.html"
-    context_object_name = "categoria"
-    success_url = reverse_lazy("inv:categorias")
+    elif request.method == 'POST':
+        form = CategoriaForm(request.POST, instance=categoria)
 
-# Todo sucede a partir de un click en el botón de inactivar categoría
-def categoria_estado(request, id): # categoria inactiva, subcategorias y productos inactivos, y viceversa
-    categoria = Categoria.objects.filter(pk=id).first() # categoria a inactivar o activar
+        if form.is_valid():
+            form.instance.um = request.user.id
+            form.save()
 
-    subcategorias = SubCategoria.objects.filter(categoria=id).all() # subcategorias de la categoria
+        messages.info(request, "Categoría Editada Satisfactoriamente") # Por esta línea, es una función
+
+        return redirect("inv:categorias")
+    
+    contextos = {'form': form, 'categoria': categoria}
+    
+    return render(request, template, contextos)
+
+@login_required(login_url='bases:login')
+@permission_required('inventario.delete_categoria', login_url='bases:sin_privilegios')
+def categoria_delete(request, id_categoria):
+    categoria = Categoria.objects.get(id=id_categoria)
+    template = "inventario/categoria_delete.html"
+
+    if request.method == 'GET':
+        contexto = {'categoria': categoria}
+
+    elif request.method == 'POST':
+        categoria.delete()
+
+        messages.error(request, "Categoría Eliminada Satisfactoriamente") # Por esta línea, es una función
+
+        return redirect("inv:categorias")
+    
+    return render(request, template, contexto)
+
+@login_required(login_url='bases:login')
+@permission_required('inventario.change_categoria', login_url='bases:sin_privilegios')
+def categoria_estado(request, id_categoria): # Categoría inactivas, subcategorias y productos también, y viceversa
+    categoria = Categoria.objects.filter(pk=id_categoria).first()
+    subcategorias = SubCategoria.objects.filter(categoria=id_categoria).all() # Queryset
 
     contexto = {}
-    template = "inventario/categorias/categoria_estado.html"
+    template = "inventario/categoria_estado.html"
 
     if not categoria:
         return redirect('inv:categorias')
     else:
         if request.method == 'GET':
             contexto = {'categoria': categoria}
+
         elif request.method == 'POST':
-            lista = []
+            id_subcategorias = []
 
             for subcategoria in subcategorias:
-                id = subcategoria.pk
-                lista.append(id) # lista guarda los id's de las subcategorias
+                id_subcategoria = subcategoria.pk
+                id_subcategorias.append(id_subcategoria)
             
-            lista2 = []
+            productos = []
 
-            for id in lista:
-                producto = Producto.objects.filter(subcategoria=id).all() # se obtiene los productos de cada subcategoria en un "qs"
-                lista2.append(producto) # cada qs se guarda en una lista
+            for id_subcategoria in id_subcategorias:
+                producto = Producto.objects.filter(subcategoria=id_subcategoria).all() # Queryset, tiene registros
+                productos.append(producto) # Lista de Querysets
 
-            # Se cambia el estado al hacer click
             if categoria.estado:
-                categoria.estado = False
+                categoria.estado = False # Inactivada
 
-                if subcategorias: # Para sus subcategorias
+                if subcategorias:
                     for subcategoria in subcategorias:
                         subcategoria.estado = False # Inactivada
                         subcategoria.save()
-                if lista2: # y sus productos
-                    for qs in lista2:
+
+                if productos: # y sus productos
+                    for qs in productos:
                         for producto in qs:
-                            producto.estado = False
+                            producto.estado = False # Inactivada
                             producto.save()
 
             else:
-                categoria.estado = True
+                categoria.estado = True # Activada
 
                 if subcategorias:
                     for subcategoria in subcategorias:
                         subcategoria.estado = True # Activada
                         subcategoria.save()
-                if lista2:
-                    for qs in lista2:
+
+                if productos:
+                    for qs in productos:
                         for producto in qs:
-                            producto.estado = True
+                            producto.estado = True # Activada
                             producto.save()
-                # Porque con subcategoria es uno a muchos
-                # Y subcategoría hace uno a muchos con Producto
 
-            categoria.save() # Guardar cambios, siempre
-
+            categoria.save() # Cambios realizados
             
             contexto = {'categoria': 'OK'}
 
+            """Ya no se hará una operación reversa"""
             if not categoria.estado:
 
-                return HttpResponse('Categoría inactivada')
+                messages.error(request, "Categoría Inactivada Satisfactoriamente")
 
             else:
 
-                return HttpResponse('Categoría activada')
+                messages.success(request, "Categoría Activada Satisfactoriamente")
+            
+            return redirect("inv:categorias")
 
     return render(request, template, contexto)
 
-def subcategoria_list(request): # Implementación de una lógica especial en el listado de las subcategorias, permisos de usuario
+@login_required(login_url='bases:login')
+@permission_required('inventario.view_subcategoria', login_url='bases:sin_privilegios')
+def subcategoria_list(request):
     subcategorias = SubCategoria.objects.all()
-
     categorias = Categoria.objects.all()
-    cantidad_categorias = categorias.count()
-
     categorias_inactivas = Categoria.objects.filter(estado=False).all()
+
+    cantidad_categorias = categorias.count()
     cantidad_categorias_inactivas = categorias_inactivas.count()
 
-    context = {'categorias': categorias, 'cantidad_categorias': cantidad_categorias, 'cantidad_categorias_inactivas': cantidad_categorias_inactivas, 'subcategorias': subcategorias}
+    contextos = {'categorias': categorias, 'subcategorias': subcategorias, 'cantidad_categorias': cantidad_categorias, 'cantidad_categorias_inactivas': cantidad_categorias_inactivas}
 
-    template = 'inventario/subcategorias/subcategorias.html' # La lógica se observa en la plantilla
+    template = 'inventario/subcategorias.html' # La lógica se observa en la plantilla
 
-    return render(request, template, context)
+    return render(request, template, contextos)
 
-class SubCategoriaCreateView(LoginRequiredMixin, generic.CreateView):
+class SubCategoriaCreateView(SuccessMessageMixin, SinPrivilegios, \
+    CreateView):
+    permission_required = "inventario.add_subcategoria"
     model = SubCategoria
-    template_name = "inventario/subcategorias/subcategoria_form.html"
+    template_name = "inventario/subcategoria_form.html"
     context_object_name = "subcategoria"
     form_class = SubCategoriaForm
     success_url = reverse_lazy("inv:subcategorias")
-    login_url = "bases:login"
+    success_message = "SubCategoría Creada Satisfactoriamente"
 
     def form_valid(self, form):
         form.instance.uc = self.request.user
         return super().form_valid(form)
 
-class SubCategoriaUpdateView(LoginRequiredMixin, generic.UpdateView):
-    model = SubCategoria
-    template_name = "inventario/subcategorias/subcategoria_form.html"
-    context_object_name = "subcategoria"
-    form_class = SubCategoriaForm
-    success_url = reverse_lazy("inv:subcategorias")
-    login_url = "bases:login"
+@login_required(login_url='bases:login')
+@permission_required('inventario.change_subcategoria', login_url='bases:sin_privilegios')
+def subcategoria_edit(request, id_subcategoria):
+    subcategoria = SubCategoria.objects.get(id=id_subcategoria)
+    template = "inventario/subcategoria_form.html"
 
-    def form_valid(self, form):
-        form.instance.um = self.request.user.id
-        return super().form_valid(form)
+    if request.method == 'GET':
+        form = SubCategoriaForm(instance=subcategoria)
 
-class SubCategoriaDeleteView(LoginRequiredMixin, generic.DeleteView):
-    model = SubCategoria
-    template_name = "inventario/subcategorias/subcategoria_delete.html"
-    context_object_name = "subcategoria"
-    success_url = reverse_lazy("inv:subcategorias")
+    elif request.method == 'POST':
+        form = SubCategoriaForm(request.POST, instance=subcategoria)
 
-def subcategoria_estado(request, id): # subcategoria inactiva, productos inactivos, y viceversa
-    subcategoria = SubCategoria.objects.filter(pk=id).first()
+        if form.is_valid():
+            form.instance.um = request.user.id
+            form.save()
 
-    productos_activos = Producto.objects.filter(subcategoria=id, estado=True).all()
-    productos_inactivos = Producto.objects.filter(subcategoria=id, estado=False).all()
+        messages.info(request, "SubCategoría Editada Satisfactoriamente")
+
+        return redirect("inv:subcategorias")
+    
+    contextos = {'form': form, 'subcategoria': subcategoria}
+    
+    return render(request, template, contextos)
+
+@login_required(login_url='bases:login')
+@permission_required('inventario.delete_subcategoria', login_url='bases:sin_privilegios')
+def subcategoria_delete(request, id_subcategoria):
+    subcategoria = SubCategoria.objects.get(id=id_subcategoria)
+    template = "inventario/subcategoria_delete.html"
+
+    if request.method == 'GET':
+        contexto = {'subcategoria': subcategoria}
+
+    elif request.method == 'POST':
+        subcategoria.delete()
+
+        messages.error(request, "SubCategoría Eliminada Satisfactoriamente")
+
+        return redirect("inv:subcategorias")
+    
+    return render(request, template, contexto)
+
+@login_required(login_url='bases:login')
+@permission_required('inventario.change_subcategoria', login_url='bases:sin_privilegios')
+def subcategoria_estado(request, id_subcategoria): # subcategoria inactiva, productos inactivos, y viceversa
+    subcategoria = SubCategoria.objects.filter(pk=id_subcategoria).first()
+    productos = Producto.objects.filter(subcategoria=id_subcategoria).all()
 
     contexto = {}
-
-    template = "inventario/subcategorias/subcategoria_estado.html"
+    template = "inventario/subcategoria_estado.html"
 
     if not subcategoria:
         return redirect('inv:subcategorias')
     else:
         if request.method == 'GET':
             contexto = {'subcategoria': subcategoria}
+
         elif request.method == 'POST':
-            # Se hace la operación contraria, solo si lo necesita
-            # (No voy a inactivar, el registro que ya está inactivo, XD)
-            # Es otra forma, más "lógica" de hacerlo
+
             if subcategoria.estado:
                 subcategoria.estado = False
 
-                if productos_activos:
-                    for producto in productos_activos:
+                if productos:
+                    for producto in productos:
                         producto.estado = False
                         producto.save()
 
             else:
                 subcategoria.estado = True
 
-                if productos_inactivos:
-                    for producto in productos_inactivos:
+                if productos:
+                    for producto in productos:
                         producto.estado = True
                         producto.save()
             
@@ -201,76 +264,109 @@ def subcategoria_estado(request, id): # subcategoria inactiva, productos inactiv
 
             if not subcategoria.estado:
 
-                return HttpResponse('Subcategoría inactivada')
+                messages.error(request, "SubCategoría Inactivada Satisfactoriamente")
 
             else:
 
-                return HttpResponse('Subcategoría activada')
+                messages.success(request, "SubCategoría Activada Satisfactoriamente")
+
+            return redirect("inv:subcategorias")
 
     return render(request, template, contexto)
 
-class MarcaListView(LoginRequiredMixin, generic.ListView):
+class MarcaListView(SinPrivilegios, \
+    ListView):
+    permission_required = "inventario.view_marca"
     model = Marca
-    template_name = "inventario/marcas/marcas.html"
+    template_name = "inventario/marcas.html"
     context_object_name = "marcas"
-    login_url = "bases:login"
 
-class MarcaCreateView(LoginRequiredMixin, generic.CreateView):
+class MarcaCreateView(SuccessMessageMixin, SinPrivilegios, \
+    CreateView):
+    permission_required = "inventario.add_marca"
     model = Marca
-    template_name = "inventario/marcas/marca_form.html"
+    template_name = "inventario/marca_form.html"
     context_object_name = "marca"
     form_class = MarcaForm
     success_url = reverse_lazy("inv:marcas")
-    login_url = "bases:login"
+    success_message = "Marca Creada Satisfactoriamente"
 
     def form_valid(self, form):
         form.instance.uc = self.request.user
         return super().form_valid(form)
 
-class MarcaUpdateView(LoginRequiredMixin, generic.UpdateView):
-    model = Marca
-    template_name = "inventario/marcas/marca_form.html"
-    context_object_name = "marca"
-    form_class = MarcaForm
-    success_url = reverse_lazy("inv:marcas")
-    login_url = "bases:login"
+@login_required(login_url='bases:login')
+@permission_required('inventario.change_marca', login_url='bases:sin_privilegios')
+def marca_edit(request, id_marca):
+    marca = Marca.objects.get(id=id_marca)
+    template = "inventario/marca_form.html"
 
-class MarcaDeleteView(LoginRequiredMixin, generic.DeleteView):
-    model = Marca
-    template_name = "inventario/marcas/marca_delete.html"
-    context_object_name = "marca"
-    success_url = reverse_lazy("inv:marcas")
-    login_url = "bases:login"
+    if request.method == 'GET':
+        form = MarcaForm(instance=marca)
 
-def marca_estado(request, id): # marca inactiva, productos inactivos, y viceversa
-    marca = Marca.objects.filter(pk=id).first()
+    elif request.method == 'POST':
+        form = MarcaForm(request.POST, instance=marca)
 
-    productos_activos = Producto.objects.filter(marca=id, estado=True).all()
-    productos_inactivos = Producto.objects.filter(marca=id, estado=False).all()
+        if form.is_valid():
+            form.instance.um = request.user.id
+            form.save()
+
+        messages.info(request, "Marca Editada Satisfactoriamente")
+
+        return redirect("inv:marcas")
+    
+    contextos = {'form': form, 'marca': marca}
+    
+    return render(request, template, contextos)
+
+@login_required(login_url='bases:login')
+@permission_required('inventario.delete_marca', login_url='bases:sin_privilegios')
+def marca_delete(request, id_marca):
+    marca = Marca.objects.get(id=id_marca)
+    template = "inventario/marca_delete.html"
+
+    if request.method == 'GET':
+        contexto = {'marca': marca}
+
+    elif request.method == 'POST':
+        marca.delete()
+
+        messages.error(request, "Marca Eliminada Satisfactoriamente")
+
+        return redirect("inv:marcas")
+    
+    return render(request, template, contexto)
+
+@login_required(login_url='bases:login')
+@permission_required('inventario.change_marca', login_url='bases:sin_privilegios')
+def marca_estado(request, id_marca):
+    marca = Marca.objects.filter(pk=id_marca).first()
+
+    productos = Producto.objects.filter(marca=id_marca).all()
 
     contexto = {}
-
-    template = "inventario/marcas/marca_estado.html"
+    template = "inventario/marca_estado.html"
     
     if not marca:
         return redirect('inv:marcas')
     else:
         if request.method == 'GET':
             contexto = {'marca': marca}
+
         elif request.method == 'POST':
             if marca.estado:
                 marca.estado = False
 
-                if productos_activos:
-                    for producto in productos_activos:
+                if productos:
+                    for producto in productos:
                         producto.estado = False
                         producto.save()
 
             else:
                 marca.estado = True
 
-                if productos_inactivos:
-                    for producto in productos_inactivos:
+                if productos:
+                    for producto in productos:
                         producto.estado = True
                         producto.save()
             
@@ -280,80 +376,109 @@ def marca_estado(request, id): # marca inactiva, productos inactivos, y vicevers
 
             if not marca.estado:
 
-                return HttpResponse('Marca inactivada')
+                messages.error(request, "Marca Inactivada Satisfactoriamente")
 
             else:
 
-                return HttpResponse('Marca activada')
+                messages.success(request, "Marca Activada Satisfactoriamente")
+            
+            return redirect("inv:marcas")
     
     return render(request, template, contexto)
 
-class UMListView(LoginRequiredMixin, generic.ListView):
+class UMListView(SinPrivilegios, \
+    ListView):
+    permission_required = "inventario.view_unidadmedida"
     model = UnidadMedida
-    template_name = "inventario/unidades_medida/um.html"
+    template_name = "inventario/um.html"
     context_object_name = "unidades"
-    login_url = "bases:login"
 
-class UMCreateView(LoginRequiredMixin, generic.CreateView):
+class UMCreateView(SuccessMessageMixin, SinPrivilegios, \
+    CreateView):
+    permission_required = "inventario.add_unidadmedida"
     model = UnidadMedida
-    template_name = "inventario/unidades_medida/um_form.html"
+    template_name = "inventario/um_form.html"
     context_object_name = "um"
     form_class = UMForm
     success_url = reverse_lazy("inv:um")
-    login_url = "bases:login"
+    success_message = "Unidad de Medida Creada Satisfactoriamente"
 
     def form_valid(self, form):
         form.instance.uc = self.request.user
         return super().form_valid(form)
 
-class UMUpdateView(LoginRequiredMixin, generic.UpdateView):
-    model = UnidadMedida
-    template_name = "inventario/unidades_medida/um_form.html"
-    context_object_name = "um"
-    form_class = UMForm
-    success_url = reverse_lazy("inv:um")
-    login_url = "bases:login"
+@login_required(login_url='bases:login')
+@permission_required('inventario.change_unidadmedida', login_url='bases:sin_privilegios')
+def um_edit(request, id_um):
+    um = UnidadMedida.objects.get(id=id_um)
+    template = "inventario/um_form.html"
 
-    def form_valid(self, form):
-        form.instance.um = self.request.user.id
-        return super().form_valid(form)
+    if request.method == 'GET':
+        form = UMForm(instance=um)
 
-class UMDeleteView(LoginRequiredMixin, generic.DeleteView):
-    model = UnidadMedida
-    template_name = "inventario/unidades_medida/um_delete.html"
-    context_object_name = "um"
-    success_url = reverse_lazy("inv:um")
-    login_url = "bases:login"
+    elif request.method == 'POST':
+        form = UMForm(request.POST, instance=um)
 
-def um_estado(request, id): # unidad de medida inactiva, productos inactivos, y viceversa
-    um = UnidadMedida.objects.filter(pk=id).first()
+        if form.is_valid():
+            form.instance.um = request.user.id
+            form.save()
 
-    productos_activos = Producto.objects.filter(unidad_medida=id, estado=True).all()
-    productos_inactivos = Producto.objects.filter(unidad_medida=id, estado=False).all()
+        messages.info(request, "Unidad de Medida Editada Satisfactoriamente")
+
+        return redirect("inv:um")
+    
+    contextos = {'form': form, 'um': um}
+    
+    return render(request, template, contextos)
+
+@login_required(login_url='bases:login')
+@permission_required('inventario.delete_unidadmedida', login_url='bases:sin_privilegios')
+def um_delete(request, id_um):
+    um = UnidadMedida.objects.get(id=id_um)
+    template = "inventario/um_delete.html"
+
+    if request.method == 'GET':
+        contexto = {'um': um}
+
+    elif request.method == 'POST':
+        um.delete()
+
+        messages.error(request, "Unidad de Medida Eliminada Satisfactoriamente")
+
+        return redirect("inv:um")
+    
+    return render(request, template, contexto)
+
+@login_required(login_url='bases:login')
+@permission_required('inventario.change_unidadmedida', login_url='bases:sin_privilegios')
+def um_estado(request, id_um):
+    um = UnidadMedida.objects.filter(pk=id_um).first()
+
+    productos = Producto.objects.filter(unidad_medida=id_um).all()
     
     contexto = {}
-
-    template = "inventario/unidades_medida/um_estado.html"
+    template = "inventario/um_estado.html"
 
     if not um:
         return redirect('inv:um')
     else:
         if request.method == 'GET':
             contexto = {'um': um}
+
         elif request.method == 'POST':
             if um.estado:
                 um.estado = False
 
-                if productos_activos:
-                    for producto in productos_activos:
+                if productos:
+                    for producto in productos:
                         producto.estado = False
                         producto.save()
 
             else:
                 um.estado = True
 
-                if productos_inactivos:
-                    for producto in productos_inactivos:
+                if productos:
+                    for producto in productos:
                         producto.estado = True
                         producto.save()
             
@@ -363,84 +488,115 @@ def um_estado(request, id): # unidad de medida inactiva, productos inactivos, y 
 
             if not um.estado:
 
-                return HttpResponse('Unidad de Medida inactivada')
+                messages.error(request, "Unidad de Medida Inactivada Satisfactoriamente")
 
             else:
 
-                return HttpResponse('Unidad de Medida activada')
+                messages.success(request, "Unidad de Medida Activada Satisfactoriamente")
+            
+            return redirect("inv:um")
 
     return render(request, template, contexto)
 
-def producto_list(request): # Implementación de una lógica más avanzada en el listado de los productos, permisos de usuario
+@login_required(login_url='bases:login')
+@permission_required('inventario.view_producto', login_url='bases:sin_privilegios')
+def producto_list(request):
     productos = Producto.objects.all()
-
     subcategorias = SubCategoria.objects.all()
-    subcategorias_inactivas = SubCategoria.objects.filter(estado=False).all()
-
-    cantidad_subcategorias = subcategorias.count()
-    cantidad_subcategorias_inactivas = subcategorias_inactivas.count()
-
     marcas = Marca.objects.all()
-    marcas_inactivas = Marca.objects.filter(estado=False).all()
-
-    cantidad_marcas = marcas.count()
-    cantidad_marcas_inactivas = marcas_inactivas.count()
-
     unidades_medida = UnidadMedida.objects.all()
+
+    subcategorias_inactivas = SubCategoria.objects.filter(estado=False).all()
+    marcas_inactivas = Marca.objects.filter(estado=False).all()
     unidad_medida_inactivas = UnidadMedida.objects.filter(estado=False).all()
 
+    cantidad_subcategorias = subcategorias.count()
+    cantidad_marcas = marcas.count()
     cantidad_um = unidades_medida.count()
+
+    cantidad_subcategorias_inactivas = subcategorias_inactivas.count()
+    cantidad_marcas_inactivas = marcas_inactivas.count()
     cantidad_um_inactivas = unidad_medida_inactivas.count()
 
-    context = {'subcategorias': subcategorias, 'marcas': marcas, 'unidades_medida': unidades_medida, 'cantidad_subcategorias': cantidad_subcategorias, 'cantidad_subcategorias_inactivas': cantidad_subcategorias_inactivas, 'cantidad_marcas': cantidad_marcas, 'cantidad_marcas_inactivas': cantidad_marcas_inactivas,  'cantidad_um': cantidad_um, 'cantidad_um_inactivas': cantidad_um_inactivas, 'productos': productos}
+    contextos = {'productos': productos, 'subcategorias': subcategorias, 'marcas': marcas, 'unidades_medida': unidades_medida, 'cantidad_subcategorias': cantidad_subcategorias, \
+        'cantidad_marcas': cantidad_marcas, 'cantidad_um': cantidad_um, 'cantidad_subcategorias_inactivas': cantidad_subcategorias_inactivas, 'cantidad_marcas_inactivas': cantidad_marcas_inactivas, \
+            'cantidad_um_inactivas': cantidad_um_inactivas}
 
-    template = 'inventario/productos/productos.html' # La lógica es similar a subcategoria_list
+    template = 'inventario/productos.html' # La lógica es similar a subcategoria_list
 
-    return render(request, template, context)
+    return render(request, template, contextos)
 
-class ProductoCreateView(LoginRequiredMixin, generic.CreateView):
+class ProductoCreateView(SuccessMessageMixin, SinPrivilegios, \
+    CreateView):
+    permission_required = "inventario.add_producto"
     model = Producto
-    template_name = "inventario/productos/producto_form.html"
+    template_name = "inventario/producto_form.html"
     context_object_name = "producto"
     form_class = ProductoForm
     success_url = reverse_lazy("inv:productos")
-    login_url = "bases:login"
+    success_message = "Producto Creado Satisfactoriamente"
 
     def form_valid(self, form):
         form.instance.uc = self.request.user
         return super().form_valid(form)
 
-class ProductoUpdateView(LoginRequiredMixin, generic.UpdateView):
-    model = Producto
-    template_name = "inventario/productos/producto_form.html"
-    context_object_name = "producto"
-    form_class = ProductoForm
-    success_url = reverse_lazy("inv:productos")
-    login_url = "bases:login"
+@login_required(login_url='bases:login')
+@permission_required('inventario.change_producto', login_url='bases:sin_privilegios')
+def producto_edit(request, id_producto):
+    producto = Producto.objects.get(id=id_producto)
+    template = "inventario/producto_form.html"
 
-    def form_valid(self, form):
-        form.instance.producto = self.request.user.id
-        return super().form_valid(form)
+    if request.method == 'GET':
+        form = ProductoForm(instance=producto)
 
-class ProductoDeleteView(LoginRequiredMixin, generic.DeleteView):
-    model = Producto
-    template_name = "inventario/productos/producto_delete.html"
-    context_object_name = "producto"
-    success_url = reverse_lazy("inv:productos")
-    login_url = "bases:login"
+    elif request.method == 'POST':
+        form = ProductoForm(request.POST, instance=producto)
 
-def producto_estado(request, id): # producto es una tabla débil, depende de otras, por eso su inactivar es simple.
-    producto = Producto.objects.filter(pk=id).first()
+        if form.is_valid():
+            form.instance.um = request.user.id
+            form.save()
+
+        messages.info(request, "Producto Editado Satisfactoriamente")
+
+        return redirect("inv:productos")
+    
+    contextos = {'form': form, 'producto': producto}
+    
+    return render(request, template, contextos)
+
+@login_required(login_url='bases:login')
+@permission_required('inventario.delete_producto', login_url='bases:sin_privilegios')
+def producto_delete(request, id_producto):
+    producto = Producto.objects.get(id=id_producto)
+    template = "inventario/producto_delete.html"
+
+    if request.method == 'GET':
+        contexto = {'producto': producto}
+
+    elif request.method == 'POST':
+
+        producto.delete()
+
+        messages.error(request, "Producto Eliminado Satisfactoriamente")
+
+        return redirect("inv:productos")
+    
+    return render(request, template, contexto)
+
+@login_required(login_url='bases:login')
+@permission_required('inventario.change_producto', login_url='bases:sin_privilegios')
+def producto_estado(request, id_producto):
+    producto = Producto.objects.filter(pk=id_producto).first()
 
     contexto = {}
-
-    template = "inventario/productos/producto_estado.html"
+    template = "inventario/producto_estado.html"
 
     if not producto:
         return redirect('inv:productos')
     else:
         if request.method == 'GET':
             contexto = {'producto': producto}
+
         elif request.method == 'POST':
             if producto.estado:
                 producto.estado = False
@@ -453,10 +609,12 @@ def producto_estado(request, id): # producto es una tabla débil, depende de otr
 
             if not producto.estado:
 
-                return HttpResponse('Producto inactivado')
+                messages.error(request, "Producto Inactivado Satisfactoriamente")
 
             else:
 
-                return HttpResponse('Producto activado')
+                messages.success(request, "Producto Activado Satisfactoriamente")
+            
+            return redirect("inv:productos")
 
     return render(request, template, contexto)

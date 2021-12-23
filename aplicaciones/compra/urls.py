@@ -7,7 +7,7 @@ app_name = "compra"
 urlpatterns = [
     path('proveedores/', ProveedorListView.as_view(), name="proveedores"),
     path('nuevo/proveedor/', ProveedorCreateView.as_view(), name="proveedor_new"),
-    path('editar/proveedor/<int:pk>', ProveedorUpdateView.as_view(), name="proveedor_edit"),
+    path('editar/proveedor/<int:id_proveedor>', proveedor_edit, name="proveedor_edit"),
     path('eliminar/proveedor/<int:pk>', ProveedorDeleteView.as_view(), name="proveedor_delete"),
-    path('cambiar/estado/proveedor/<int:id>', proveedor_estado, name="proveedor_estado"),
+    path('cambiar/estado/proveedor/<int:id_proveedor>', proveedor_estado, name="proveedor_estado"),
 ]

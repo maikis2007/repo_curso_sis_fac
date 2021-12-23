@@ -3,11 +3,11 @@
         <form action="{% url 'inv:categoria_estado' categoria.id %}" method="POST">
             {% csrf_token %}
             <div class="col-xl-12 col-md-12 mb-12">
-                <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card {% if categoria.estado == True %} border-left-danger {% else %} border-left-success {% endif %} shadow h-100 py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
+                                <div class="text-xs font-weight-bold {% if not categoria.estado == True %} text-success {% else %} text-danger {% endif %} text-uppercase mb-1">
                                     {% if categoria.estado == True %}
                                         ¿Desea inactivar 
                                     {% else %}
@@ -15,7 +15,7 @@
                                     {% endif %}
                                     <strong>{{ categoria.descripcion }}</strong>?
                                 </div>
-                                <button type="button" class="btn {% if categoria.estado == True %} btn-danger {% else %} btn-success {% endif %}" id="btnInactivar">
+                                <button type="submit" class="btn {% if categoria.estado == True %} btn-danger {% else %} btn-success {% endif %}">
                                     <span class="fa fa-save"></span>
                                     {% if categoria.estado == True %}
                                         Inactivar
@@ -38,49 +38,3 @@
         </form>
     </div>
 </div>
-
-<script>
-    $(document).ready(function(){
-
-        var token = $('input[name=csrfmiddlewaretoken]').val();
-
-        $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
-                    xhr.setRequestHeader("X-CSRFToken", token);
-                }
-            }
-        });
-
-        $("#btnInactivar").click(function(e){
-
-            e.preventDefault(); // Desactivar el envío permanentemente
-            //alert("Probando");
-            
-            var id = {{ categoria.id }};
-            var url = "{% url 'inv:categoria_estado' categoria.id %}";
-            var data = {"id": id};
-            data = JSON.stringify(data); // {"id": id}
-
-            $.ajax({
-                type: "POST",
-                url: url,
-                data: data,
-                beforeSend: function(xhr,settings){
-                    $.ajaxSettings.beforeSend(xhr,settings);
-                },
-                success: function(response){ /* recibe la respuesta de la vista */
-                    alert(response);
-                    console.log(response);
-                    cerrar_modal();
-                    location.reload()
-                },
-                error: function(jqXHR, textStatus, errorThrow){
-                    console.log(textStatus, errorThrow);
-                }
-            })
-
-        });
-
-    });
-</script>

@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'base/layout.html' %}
 
 {% load static %}
 
@@ -6,7 +6,7 @@
 
 {% block aplicacion %} show {% endblock aplicacion %}
 
-{% block marca %} active {% endblock marca %}
+{% block um %} active {% endblock um %}
 
 {% block page_content %}
     <form action="#" method="POST">
@@ -14,7 +14,7 @@
 
         <!-- Earnings (Annual) Card Example -->
         <div class="col-xl-8 col-md-8 mb-8">
-            {% if not marca %}
+            {% if not um %}
             <div class="card border-left-success shadow h-100 py-2">
             {% else %}
             <div class="card border-left-warning shadow h-100 py-2">
@@ -22,13 +22,13 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            {% if not marca %}
+                            {% if not um %}
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Nueva Marca
+                                Nueva Unidad de Medida
                             </div>
                             {% else %}
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Editar Marca
+                                Editar Unidad de Medida
                             </div>
                             {% endif %}
                             <div class="row">
@@ -49,7 +49,7 @@
                                         <span class="fa fa-save"></span>
                                         Guardar
                                     </button>
-                                    <a href="{% url 'inv:marcas' %}" class="btn btn-danger">
+                                    <a href="{% url 'inv:um' %}" class="btn btn-danger">
                                         <span class="fa fa-undo"></span>
                                         Cancelar
                                     </a>
@@ -70,4 +70,3 @@
     
 
 {% endblock js %}
-

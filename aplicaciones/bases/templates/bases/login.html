@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'base/layout.html' %}
 
 {% block wrapper %} {% endblock wrapper %}
 {% block logout %} {% endblock logout %}
@@ -67,3 +67,25 @@
 
     </div>
 {% endblock login %}
+
+{% block js %}
+
+    <script>
+        {% if form.errors %}
+            {% for field in form %}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        mensaje('{{ error|escape }}', 'red');
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        
+            {% if form.non_field_errors%}
+                {% for error in form.non_field_errors %}
+                    mensaje('{{ error|escape }}', 'red');
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+    </script>
+
+{% endblock js %}

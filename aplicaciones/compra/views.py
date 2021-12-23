@@ -1,56 +1,77 @@
-from re import template
-from django.db.models import query
-from django.http import response
+from django.contrib.auth.decorators import permission_required
 from django.shortcuts import redirect, render, HttpResponse
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views import generic
 from django.urls import reverse_lazy
-from aplicaciones.compra.models import *
-from aplicaciones.compra.forms import *
+
+from django.contrib.auth.decorators import login_required, permission_required
+
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
+
+from django.views import generic
+
+from .models import Proveedor
+from .forms import ProveedorForm
+
+from aplicaciones.bases.views import SinPrivilegios
 
 # Create your views here.
 
-class ProveedorListView(LoginRequiredMixin, generic.ListView):
+class ProveedorListView(SinPrivilegios, \
+    generic.ListView):
+    permission_required = "compra.view_proveedor"
     model = Proveedor
-    template_name = "compra/proveedores/proveedores.html"
+    template_name = "compra/proveedores.html"
     context_object_name = "proveedores"
-    login_url = "bases:login"
 
-class ProveedorCreateView(LoginRequiredMixin, generic.CreateView):
+class ProveedorCreateView(SuccessMessageMixin, SinPrivilegios, \
+    generic.CreateView):
+    permission_required = "compra.add_proveedor"
     model = Proveedor
-    template_name = "compra/proveedores/proveedor_form.html"
+    template_name = "compra/proveedor_form.html"
     context_object_name = "proveedor"
     form_class = ProveedorForm
     success_url = reverse_lazy("cmp:proveedores")
-    login_url = "bases:login"
+    success_message = "Proveedor Creado Satisfactoriamente"
 
     def form_valid(self, form):
         form.instance.uc = self.request.user
         return super().form_valid(form)
 
-class ProveedorUpdateView(LoginRequiredMixin, generic.UpdateView):
+@login_required(login_url='bases:login')
+@permission_required('compra.change_proveedor', login_url='bases:sin_privilegios')
+def proveedor_edit(request, id_proveedor):
+    proveedor = Proveedor.objects.get(id=id_proveedor)
+    template = "compra/proveedor_form.html"
+
+    if request.method == 'GET':
+        form = ProveedorForm(instance=proveedor)
+    elif request.method == 'POST':
+        form = ProveedorForm(request.POST, instance=proveedor)
+        if form.is_valid():
+            form.instance.um = request.user.id
+            form.save()
+        messages.info(request, "Proveedor Editado Satisfactoriamente")
+        return redirect("cmp:proveedores")
+    
+    contextos = {'form': form, 'proveedor': proveedor}
+    
+    return render(request, template, contextos)
+
+class ProveedorDeleteView(SinPrivilegios, \
+    generic.DeleteView):
+    permission_required = "compra.delete_proveedor"
     model = Proveedor
-    template_name = "compra/proveedores/proveedor_form.html"
-    context_object_name = "proveedor"
-    form_class = ProveedorForm
-    success_url = reverse_lazy("cmp:proveedores")
-    login_url = "bases:login"
-
-    def form_valid(self, form):
-        form.instance.um = self.request.user.id
-        return super().form_valid(form)
-
-class ProveedorDeleteView(LoginRequiredMixin, generic.DeleteView):
-    model = Proveedor
-    template_name = "compra/proveedores/proveedor_delete.html"
+    template_name = "compra/proveedor_delete.html"
     context_object_name = "proveedor"
     success_url = reverse_lazy("cmp:proveedores")
-    login_url = "bases:login"
 
-def proveedor_estado(request, id):
-    proveedor = Proveedor.objects.filter(pk=id).first()
+@login_required(login_url='bases:login')
+@permission_required('compra.change_proveedor', login_url='bases:sin_privilegios')
+def proveedor_estado(request, id_proveedor):
+    proveedor = Proveedor.objects.filter(pk=id_proveedor).first()
+
     contexto = {}
-    template = "compra/proveedores/proveedor_estado.html"
+    template = "compra/proveedor_estado.html"
 
     if not proveedor:
         return redirect("cmp:proveedores")
@@ -69,8 +90,8 @@ def proveedor_estado(request, id):
             contexto = {'proveedor': 'OK'}
 
             if not proveedor.estado:
-                return HttpResponse('Proveedor inactivado')
+                return HttpResponse('Proveedor Inactivado satisfactoriamente')
             else:
-                return HttpResponse('Proveedor activado')
+                return HttpResponse('Proveedor Activado satisfactoriamente')
 
     return render(request, template, contexto)
