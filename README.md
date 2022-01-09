@@ -1,2 +1,2 @@
-# sis_fac_comp_dj_22
-Este es un sistema de facturación y compra con Django 2.2 y Python 3.8.5
+# SystemERPTICOM con Django 3.2.11
+Este es el Sistema ERP web de Ticom con Django 3.2.11 LTS y Python 3.10.0 para más detalles revisar el código y clonarlo

@@ -1,3 +1,0 @@
-.inhabilitado:not(:disabled):not(.disabled) {
-    cursor: no-drop;
-}
