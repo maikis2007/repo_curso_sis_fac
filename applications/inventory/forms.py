@@ -8,16 +8,17 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['name', 'description', 'image', 'state']
+        labels = {'name': "Nombre", 'description': 'Descripción'}
+        #widget = {'description': forms.TextInput, 'state': forms.CheckboxInput}
     
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['description'].widget.attrs.update({
-            'placeholder': 'Descripción de la Categoría'
+        super().__init__(*args, **kwargs) # accede a propiedades o atributos
+        self.fields['name'].widget.attrs.update({  # sin form-control
+            'class': 'form-control'
         })
-        for field in iter(self.fields):
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
+        self.fields['state'].widget.attrs.update({  # sin form-control
+            'class': 'form-check-switch'
+        })
 
 class SubCategoryForm(forms.ModelForm):
     category = forms.ModelChoiceField(

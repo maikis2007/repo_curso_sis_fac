@@ -16,6 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from django.shortcuts import render
+
+def prueba(request):
+    return render(request, 'base/test.html')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,8 +27,9 @@ urlpatterns = [
     path('', include("applications.bases.urls", namespace="bases") ),
     path('inv/', include("applications.inventory.urls", namespace="inv") ),
     path('cmp/', include("applications.purchase.urls", namespace="cmp") ),
-]
+    path('prueba/', prueba)
+] 
 
 if settings.DEBUG:
     from django.conf.urls.static import static
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_URL)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

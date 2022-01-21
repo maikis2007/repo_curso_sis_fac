@@ -14,6 +14,8 @@ from .forms import CategoryForm, SubCategoryForm, MarkForm, UnitMeasureForm
 
 from applications.bases.views import NoPrivileges
 
+import PIL
+
 # Create your views here.
 
 class CategoryListView(NoPrivileges, \

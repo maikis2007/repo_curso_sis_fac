@@ -1,4 +1,4 @@
-{% extends 'base/base.html' %}
+{% extends 'base.html' %}
 
 {% load static %}
 
@@ -15,34 +15,38 @@
 {% block category_side_menu_active %} side-menu--active {% endblock %}
 
 {% block content %}
-
-    <h2 class="intro-y text-lg font-medium mt-10">
+    <h2 class="intro-y text-lg font-medium mt-10 text-center sm:text-left">
         Listado de las Categorías
     </h2>
-    <div class="grid grid-cols-12 gap-6 mt-5">
-        <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
-            <a href="{% url 'inv:category_new' %}" class="btn btn-primary shadow-md mr-2">Nueva Categoría</a>
-            <div class="dropdown">
-                <button class="dropdown-toggle btn px-2 box text-gray-700 dark:text-gray-300" aria-expanded="false">
-                    <span class="w-5 h-5 flex items-center justify-center"> <i class="w-4 h-4" data-feather="plus"></i> </span>
-                </button>
-                <div class="dropdown-menu w-40">
-                    <div class="dropdown-menu__content box dark:bg-dark-1 p-2">
-                        <a href="" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"> <i data-feather="printer" class="w-4 h-4 mr-2"></i> Print </a>
-                        <a href="" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"> <i data-feather="file-text" class="w-4 h-4 mr-2"></i> Export to Excel </a>
-                        <a href="" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"> <i data-feather="file-text" class="w-4 h-4 mr-2"></i> Export to PDF </a>
+    <div class="{% if obj %} grid grid-cols-12 gap-6 mt-5 {% endif %}">
+        <div class="intro-y {% if obj %} col-span-12 {% endif %} flex flex-wrap sm:flex-nowrap items-center mt-5 {% if obj %} alineation {% else %} justify-center sm:justify-start {% endif %}">
+            <div class="new-category">
+                <a href="{% url 'inv:category_new' %}" class="btn btn-primary shadow-md mr-2">Nueva Categoría</a>
+                <div class="dropdown">
+                    <button class="dropdown-toggle btn px-2 box text-gray-700 dark:text-gray-300" aria-expanded="false">
+                        <span class="w-5 h-5 flex items-center justify-center"> <i class="w-4 h-4" data-feather="plus"></i> </span>
+                    </button>
+                    <div class="dropdown-menu w-40">
+                        <div class="dropdown-menu__content box dark:bg-dark-1 p-2">
+                            <a href="" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"> <i data-feather="printer" class="w-4 h-4 mr-2"></i> Print </a>
+                            <a href="" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"> <i data-feather="file-text" class="w-4 h-4 mr-2"></i> Export to Excel </a>
+                            <a href="" class="flex items-center block p-2 transition duration-300 ease-in-out bg-white dark:bg-dark-1 hover:bg-gray-200 dark:hover:bg-dark-2 rounded-md"> <i data-feather="file-text" class="w-4 h-4 mr-2"></i> Export to PDF </a>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="hidden md:block mx-auto text-gray-600">Mostrando de 1 a {{ total_registers }} registros en total</div>
-            <!-- El datatable mande sus datos a Django y los muestre como una variable-->
-            <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
-                <div class="w-56 relative text-gray-700 dark:text-gray-300">
-                    <input type="text" class="form-control w-56 box pr-10 placeholder-theme-13" placeholder="Buscar...">
-                    <i class="w-4 h-4 absolute my-auto inset-y-0 mr-3 right-0" data-feather="search"></i> 
+            {% if obj %}
+            <!-- El datatable mande sus datos a Django y lo muestra como una variable-->
+            <div class="total-registers text-gray-600">Mostrando de 1 a {{ total_registers }} registros en total</div>
+            <div class="search">
+                <div class="w-full sm:w-56 relative text-gray-700 dark:text-gray-300">
+                    <input type="text" class="form-control w-full sm:w-56 box pr-10 placeholder-theme-13" placeholder="Buscar...">
+                    <i class="w-4 h-4 absolute my-auto inset-y-0 mr-3 right-0 search-icon" data-feather="search"></i> 
                 </div>
             </div>
+            {% endif %}
         </div>
+        {% if obj %}
         <!-- BEGIN: Data List -->
         <div class="intro-y col-span-12 overflow-auto lg:overflow-visible">
             <table class="table table-report -mt-2">
@@ -50,6 +54,7 @@
                     <tr>
                         <th class="whitespace-nowrap">IMAGEN</th>
                         <th class="whitespace-nowrap">CATEGORÍA</th>
+                        <th class="whitespace-nowrap">F. CREACIÓN</th>
                         <th class="text-center whitespace-nowrap">ESTADO</th>
                         <th class="text-center whitespace-nowrap">ACCIONES</th>
                     </tr>
@@ -59,21 +64,30 @@
                     <tr class="intro-x">
                         <td class="w-40">
                             <div class="flex">
+                                {% if register.image %}
+                                <a href="{{ register.image.url }}" class="w-10 h-10 image-fit zoom-in">
+                                    <img class="tooltip rounded-full" src="{{ register.image.url }}" title="Actualizada el {{ register.date_updated|date:'d/m/Y' }} a las {{ register.date_updated|date:'H:i:s' }}">
+                                </a>
+                                {% else %}
                                 <div class="w-10 h-10 image-fit zoom-in">
-                                    <img alt="{{ register.description }}" class="tooltip rounded-full" src="{{ register.image.url }}" title="Actualizado el {{ register.date_updated|date:'d/m/Y' }}">
+                                    <img class="tooltip rounded-full" src="{% static 'base/img/preview-14.jpg' %}" title="Actualizada el {{ register.date_updated|date:'d/m/Y' }} a las {{ register.date_updated|date:'H:i:s' }}">
                                 </div>
+                                {% endif %}
                             </div>
                         </td>
                         <td>
-                            <a href="" class="font-medium whitespace-nowrap">{{ register.name }}</a>
+                            <p class="font-medium whitespace-nowrap">{{ register.name }}</p>
+                        </td>
+                        <td>
+                            <p>{{ register.date_created|date:'d/m/Y H:i:s' }}</p>
                         </td>
                         <td class="w-40">
-                            <div class="flex items-center justify-center text-theme-6"> <i data-feather="check-square" class="w-4 h-4 mr-2"></i> {{ register.state|yesno:"Activa, Inactiva" }} </div>
+                            <a href="" class="flex items-center justify-center {% if register.state %} text-theme-9 {% else %} text-theme-6 {% endif %}"> <i data-feather="check-square" class="w-4 h-4 mr-2"></i> {{ register.state|yesno:"Activa, Inactiva" }} </a>
                         </td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center mr-3" href="javascript:;"> <i data-feather="check-square" class="w-4 h-4 mr-1"></i> Editar </a>
-                                <a class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal" data-target="#delete-confirmation-modal"> <i data-feather="trash-2" class="w-4 h-4 mr-1"></i> Eliminar </a>
+                                <a href="" class="flex items-center mr-3" href="javascript:;"> <i data-feather="check-square" class="w-4 h-4 mr-1"></i> Ver / Editar </a>
+                                <a href="" class="flex items-center text-theme-6" href="javascript:;" data-toggle="modal" data-target="#delete-confirmation-modal"> <i data-feather="trash-2" class="w-4 h-4 mr-1"></i> Eliminar </a>
                             </div>
                         </td>
                     </tr>
@@ -111,7 +125,18 @@
             </select>
         </div>
         <!-- END: Pagination -->
+        {% else %}
+        <div class="flex justify-center sm:justify-start mt-5">
+            <div class="intro-y w-72 p-5 border-2 font-bold bg-gray-600 shadow-lg rounded-lg">
+                <p class="text-white capitalize text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    No hay categorías
+                </p>
+            </div>
+        </div>
+        {% endif %}
     </div>
+    {% if obj %}
     <!-- BEGIN: Delete Confirmation Modal -->
     <div id="delete-confirmation-modal" class="modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -134,9 +159,5 @@
             </div>
         </div>
     </div>
-    <!-- END: Delete Confirmation Modal -->
+    {% endif %}
 {% endblock content %}
-
-{% block js %}
-    <script src="{% static 'js/table.js' %}"></script>
-{% endblock js %}

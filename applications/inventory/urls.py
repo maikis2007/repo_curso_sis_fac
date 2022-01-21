@@ -2,7 +2,7 @@ from django.urls import path
 from django.urls.resolvers import URLPattern
 from applications.inventory.views import *
 
-app_name = "inventario"
+app_name = "inventory"
 
 urlpatterns = [
     path('categories/', CategoryListView.as_view(), name="category_list"),
