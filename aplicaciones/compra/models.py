@@ -1,6 +1,5 @@
 from django.db import models
 from aplicaciones.bases.models import BasesModel
-from aplicaciones.inventario.models import Producto
 
 # Create your models here.
 
@@ -27,53 +26,5 @@ class Proveedor(BasesModel):
 
     class Meta:
         verbose_name_plural = "Proveedores"
-        verbose_name = "Proveedor"
-
-class ComprasEnc(BasesModel):
-    fecha_compra=models.DateField(null=True,blank=True)
-    observacion=models.TextField(blank=True,null=True)
-    no_factura=models.CharField(max_length=100)
-    fecha_factura=models.DateField()
-    sub_total=models.FloatField(default=0)
-    descuento=models.FloatField(default=0)
-    total=models.FloatField(default=0)
-
-    proveedor=models.ForeignKey(Proveedor,on_delete=models.CASCADE)
+        verbose_name = "Proveedores"
     
-    def __str__(self):
-        return '{}'.format(self.observacion)
-
-    def save(self):
-        self.observacion = self.observacion.upper()
-        if self.sub_total == None  or self.descuento == None:
-            self.sub_total = 0
-            self.descuento = 0
-            
-        self.total = self.sub_total - self.descuento
-        super(ComprasEnc,self).save()
-
-    class Meta:
-        verbose_name_plural = "Encabezado de las Compras"
-        verbose_name="Encabezado de la Compra"
-
-class ComprasDet(BasesModel):
-    compra=models.ForeignKey(ComprasEnc,on_delete=models.CASCADE)
-    producto=models.ForeignKey(Producto,on_delete=models.CASCADE)
-    cantidad=models.BigIntegerField(default=0)
-    precio_prv=models.FloatField(default=0)
-    sub_total=models.FloatField(default=0)
-    descuento=models.FloatField(default=0)
-    total=models.FloatField(default=0)
-    costo=models.FloatField(default=0)
-
-    def __str__(self):
-        return '{}'.format(self.producto)
-
-    def save(self):
-        self.sub_total = float(self.cantidad) * self.precio_prv
-        self.total = self.sub_total - self.descuento
-        super(ComprasDet, self).save()
-    
-    class Meta:
-        verbose_name_plural = "Detalles de las Compras"
-        verbose_name="Detalle de la Compra"
