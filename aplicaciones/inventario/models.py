@@ -18,7 +18,7 @@ class Categoria(BasesModel):
     
     class Meta:
         verbose_name_plural = "Categorias"
-        verbose_name = "Categorias"
+        verbose_name = "Categoria"
 
 class SubCategoria(BasesModel):
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
@@ -36,7 +36,7 @@ class SubCategoria(BasesModel):
     
     class Meta:
         verbose_name_plural = "SubCategorias"
-        verbose_name = "SubCategorias"
+        verbose_name = "SubCategoria"
         unique_together = ('categoria', 'descripcion')
 
 class Marca(BasesModel):
@@ -54,7 +54,7 @@ class Marca(BasesModel):
 
     class Meta:
         verbose_name_plural = "Marcas"
-        verbose_name = "Marcas"
+        verbose_name = "Marca"
 
 class UnidadMedida(BasesModel):
     descripcion = models.CharField(max_length=250, help_text='Descripción de la Unidad de Medida', unique=True)
@@ -71,7 +71,7 @@ class UnidadMedida(BasesModel):
     
     class Meta:
         verbose_name_plural = "Unidades de Medida"
-        verbose_name = "Unidades de Medida"
+        verbose_name = "Unidad de Medida"
 
 class Producto(BasesModel):
     subcategoria = models.ForeignKey(SubCategoria, on_delete=models.CASCADE)
@@ -101,5 +101,5 @@ class Producto(BasesModel):
     
     class Meta:
         verbose_name_plural = "Productos"
-        verbose_name = "Productos"
+        verbose_name = "Producto"
         unique_together = ('codigo', 'codigo_barra')
