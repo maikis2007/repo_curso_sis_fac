@@ -35,6 +35,11 @@
     <!-- My styles -->
     <link rel="preload" href="{% static 'css/style.css' %}" as="style">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <!-- jQuery Date Time Picker -->
+    <link rel="preload" href="{% static 'vendor/jquery-datetimepicker/jquery.datetimepicker.css' %}" as="style">
+    <link href="{% static 'vendor/jquery-datetimepicker/jquery.datetimepicker.css' %}" rel="stylesheet">
+
 </head>
 
 <body id="page-top" class="bg-gradient-primary">
@@ -306,6 +311,16 @@
                     mensaje("{{ message }}", "{{ message.tags }}");
                 {% endfor %}
             {% endif %}
+    </script>
+
+    <!-- jQuery Date Time Picker -->
+    <script src="{% static 'vendor/jquery-datetimepicker/jquery.datetimepicker.full.min.js' %}"></script>
+
+    <!-- Init jQuery Date Time Picker -->
+    <script>
+        $(document).ready(function(){
+            jQuery.datetimepicker.setLocale('es');
+        })
     </script>
 
     <!-- Javascript from children templates -->    

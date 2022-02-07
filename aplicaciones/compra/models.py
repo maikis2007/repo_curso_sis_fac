@@ -32,7 +32,7 @@ class Proveedor(BasesModel):
 class ComprasEnc(BasesModel):
     fecha_compra=models.DateField(null=True,blank=True)
     observacion=models.TextField(blank=True,null=True)
-    no_factura=models.CharField(max_length=100)
+    nro_factura=models.CharField(max_length=100)
     fecha_factura=models.DateField()
     sub_total=models.FloatField(default=0)
     descuento=models.FloatField(default=0)
@@ -44,12 +44,12 @@ class ComprasEnc(BasesModel):
         return '{}'.format(self.observacion)
 
     def save(self):
-        self.observacion = self.observacion.upper()
-        if self.sub_total == None  or self.descuento == None:
-            self.sub_total = 0
-            self.descuento = 0
+        observacion_list = list(self.observacion) # Solo cambia la primera letra
+        observacion_list[0] = observacion_list[0].upper()
+        self.observacion = "".join(observacion_list)
             
         self.total = self.sub_total - self.descuento
+
         super(ComprasEnc,self).save()
 
     class Meta:
@@ -74,6 +74,6 @@ class ComprasDet(BasesModel):
         self.total = self.sub_total - self.descuento
         super(ComprasDet, self).save()
     
-    class Mega:
+    class Meta:
         verbose_name_plural = "Detalles de las Compras"
         verbose_name="Detalle de la Compra"
