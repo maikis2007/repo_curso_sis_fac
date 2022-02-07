@@ -10,4 +10,6 @@ urlpatterns = [
     path('editar/proveedor/<int:id_proveedor>', proveedor_edit, name="proveedor_edit"),
     path('eliminar/proveedor/<int:pk>', ProveedorDeleteView.as_view(), name="proveedor_delete"),
     path('cambiar/estado/proveedor/<int:id_proveedor>', proveedor_estado, name="proveedor_estado"),
+
+    path('compras/', ComprasListView.as_view(), name="compras")
 ]

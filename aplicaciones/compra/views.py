@@ -9,7 +9,7 @@ from django.contrib import messages
 
 from django.views import generic
 
-from .models import Proveedor
+from .models import ComprasEnc, Proveedor
 from .forms import ProveedorForm
 
 from aplicaciones.bases.views import SinPrivilegios
@@ -95,3 +95,10 @@ def proveedor_estado(request, id_proveedor):
                 return HttpResponse('Proveedor Activado satisfactoriamente')
 
     return render(request, template, contexto)
+
+class ComprasListView(SinPrivilegios, \
+    generic.ListView):
+    permission_required = "compra.view_comprasenc"
+    model = ComprasEnc
+    template_name = "compra/compras.html"
+    context_object_name = "compras"

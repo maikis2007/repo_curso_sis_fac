@@ -74,12 +74,12 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item {% block catalogos %} {% endblock catalogos %}">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCatalagos"
+                    aria-expanded="true" aria-controls="collapseCatalagos">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Catálogos</span>
                 </a>
-                <div id="collapseTwo" class="collapse {% block aplicacion %} {% endblock aplicacion %}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="collapseCatalagos" class="collapse {% block collapse %} {% endblock collapse %}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Inventario</h6>
                         {% if perms.inventario.view_categoria %}                        
@@ -100,6 +100,23 @@
                         <h6 class="collapse-header">Compra</h6>
                         {% if perms.compra.view_proveedor %}
                         <a class="collapse-item {% block proveedor %} {% endblock proveedor %}" href="{% url 'cmp:proveedores' %}">Proveedores</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item {% block movimientos %} {% endblock movimientos %}">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMovimientos"
+                    aria-expanded="true" aria-controls="collapseMovimientos">
+                    <i class="fas fa-fw fa-truck"></i>
+                    <span>Movimientos</span>
+                </a>
+                <div id="collapseMovimientos" class="collapse {% block collapse2 %} {% endblock collapse2 %}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Entradas</h6>
+                        {% if perms.compra.view_comprasenc %}                        
+                        <a class="collapse-item {% block compras %} {% endblock compras %}" href="{% url 'cmp:compras' %}">Compras</a>
                         {% endif %}
                     </div>
                 </div>
