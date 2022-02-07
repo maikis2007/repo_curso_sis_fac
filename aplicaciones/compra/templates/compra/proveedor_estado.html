@@ -1,0 +1,87 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <form action="{% url 'cmp:proveedor_estado' proveedor.id %}" method="POST">
+            {% csrf_token %}
+            <div class="col-xl-12 col-md-12 mb-12">
+                <div class="card {% if proveedor.estado == True %} border-left-danger {% else %} border-left-success {% endif %} shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold {% if not proveedor.estado == True %} text-success {% else %} text-danger {% endif %} text-uppercase mb-1">
+                                    {% if proveedor.estado == True %}
+                                        ¿Desea inactivar 
+                                    {% else %}
+                                        ¿Desea activar
+                                    {% endif %}
+                                    <strong>{{ proveedor.descripcion }}</strong>?
+                                </div>
+                                <!--<button type="submit" class="btn btn-success">-->
+                                <button type="button" class="btn {% if proveedor.estado == True %} btn-danger {% else %} btn-success {% endif %}" id="btnInactivar">
+                                    <span class="fa fa-save"></span>
+                                    {% if proveedor.estado == True %}
+                                        Inactivar
+                                    {% else %}
+                                        Activar
+                                    {% endif %}
+                                </button>
+                                <button type="button" class="btn {% if proveedor.estado == True %} btn-success {% else %} btn-danger {% endif %}" onclick="return cerrar_modal()">
+                                    <span class="fa fa-undo"></span>
+                                    Cancelar
+                                </button>
+                            </div>
+                            <div class="col-auto">
+                                <i class="far fa-question-circle fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+
+        var token = $('input[name=csrfmiddlewaretoken]').val();
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                    xhr.setRequestHeader("X-CSRFToken", token);
+                }
+            }
+        });
+
+        $("#btnInactivar").click(function(e){
+
+            e.preventDefault(); // Desactivar el envío permanentemente
+            //alert("Probando");
+            
+            var id = {{ proveedor.id }};
+            var url = "{% url 'cmp:proveedor_estado' proveedor.id %}";
+            var data = {"id": id};
+            data = JSON.stringify(data); // {"id": id}
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: data,
+                beforeSend: function(xhr,settings){
+                    $.ajaxSettings.beforeSend(xhr,settings);
+                },
+                success: function(response){ /* recibe la respuesta de la vista */
+                    cerrar_modal();
+                    var tipo = (response.startsWith('Proveedor Inactivado') ? 'red':'green');
+                    mensaje(response, tipo);
+                },
+                error: function(jqXHR, textStatus, errorThrow){
+                    cerrar_modal();
+                    mensaje(errorThrow, "red");
+                }
+            })
+
+        });
+
+    });
+</script>

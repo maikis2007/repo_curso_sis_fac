@@ -1,0 +1,40 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <form action="{% url 'inv:producto_estado' producto.id %}" method="POST">
+            {% csrf_token %}
+            <div class="col-xl-12 col-md-12 mb-12">
+                <div class="card {% if producto.estado == True %} border-left-danger {% else %} border-left-success {% endif %} shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold {% if not producto.estado == True %} text-success {% else %} text-danger {% endif %} text-uppercase mb-1">
+                                    {% if producto.estado == True %}
+                                        ¿Desea inactivar 
+                                    {% else %}
+                                        ¿Desea activar
+                                    {% endif %}
+                                    <strong>{{ producto.descripcion }}</strong>?
+                                </div>
+                                <button type="submit" class="btn {% if producto.estado == True %} btn-danger {% else %} btn-success {% endif %}">
+                                    <span class="fa fa-save"></span>
+                                    {% if producto.estado == True %}
+                                        Inactivar
+                                    {% else %}
+                                        Activar
+                                    {% endif %}
+                                </button>
+                                <button type="button" class="btn {% if producto.estado == True %} btn-success {% else %} btn-danger {% endif %}" onclick="return cerrar_modal()">
+                                    <span class="fa fa-undo"></span>
+                                    Cancelar
+                                </button>
+                            </div>
+                            <div class="col-auto">
+                                <i class="far fa-question-circle fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

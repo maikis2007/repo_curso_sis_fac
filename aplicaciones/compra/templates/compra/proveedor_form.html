@@ -1,0 +1,50 @@
+<div class="modal-dialog modal-lg"> <!-- Largo y -->
+    <div class="modal-content">
+        {% if not proveedor %}
+        <form action="{% url 'cmp:proveedor_new' %}" method="POST" class="form-inline">
+        {% else %}
+        <form action="{% url 'cmp:proveedor_edit' proveedor.id %}" method="POST" class="form-inline">
+        {% endif %}
+        {% csrf_token %}
+            <!-- Earnings (Annual) Card Example -->
+            <div class="col-xl-12 col-md-12 mb-12"> <!-- De 12 -> para qué se vea mejor -->
+                {% if not proveedor %}
+                <div class="card border-left-success shadow h-100 py-2">
+                {% else %}
+                <div class="card border-left-warning shadow h-100 py-2">
+                {% endif %}
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                {% if not proveedor %}
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Nuevo Proveedor
+                                </div>
+                                {% else %}
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Editar Proveedor
+                                </div>
+                                {% endif %}
+                                <div class="row">
+                                    {{ form.as_p }}
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <button type="submit" class="btn btn-success">
+                                            <span class="fa fa-save"></span>
+                                            Guardar
+                                        </button>
+                                        <a onclick="return cerrar_modal()" class="btn btn-danger">
+                                            <span class="fa fa-undo"></span>
+                                            Cancelar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,73 @@
+{% extends 'base/layout.html' %}
+
+{% load static %}
+
+{% block catalogos %} active {% endblock catalogos %}
+
+{% block aplicacion %} show {% endblock aplicacion %}
+
+{% block marca %} active {% endblock marca %}
+
+{% block page_content %}
+    <form action="#" method="POST">
+    {% csrf_token %}
+
+        <!-- Earnings (Annual) Card Example -->
+        <div class="col-xl-8 col-md-8 mb-8">
+            {% if not marca %}
+            <div class="card border-left-success shadow h-100 py-2">
+            {% else %}
+            <div class="card border-left-warning shadow h-100 py-2">
+            {% endif %}
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            {% if not marca %}
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Nueva Marca
+                            </div>
+                            {% else %}
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Editar Marca
+                            </div>
+                            {% endif %}
+                            <div class="row">
+                                <div class="col-10">
+                                    <div class="input-group">
+                                        {{ form.descripcion }}
+                                    </div>
+                                </div>
+                                <div class="col-2">
+                                    <div class="form-group">
+                                        {{ form.estado }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-success">
+                                        <span class="fa fa-save"></span>
+                                        Guardar
+                                    </button>
+                                    <a href="{% url 'inv:marcas' %}" class="btn btn-danger">
+                                        <span class="fa fa-undo"></span>
+                                        Cancelar
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+{% endblock page_content %}
+
+{% block js %}
+
+    
+
+{% endblock js %}
+
