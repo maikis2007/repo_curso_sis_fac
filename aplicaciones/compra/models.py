@@ -2,6 +2,11 @@ from django.db import models
 from aplicaciones.bases.models import BasesModel
 from aplicaciones.inventario.models import Producto
 
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+from django.db.models import Sum
+
 # Create your models here.
 
 class Proveedor(BasesModel):
@@ -32,7 +37,7 @@ class Proveedor(BasesModel):
 class ComprasEnc(BasesModel):
     fecha_compra=models.DateField(null=True,blank=True)
     observacion=models.TextField(blank=True,null=True)
-    nro_factura=models.CharField(max_length=100)
+    nro_factura=models.CharField(max_length=100, unique=True)
     fecha_factura=models.DateField()
     sub_total=models.FloatField(default=0)
     descuento=models.FloatField(default=0)
@@ -44,9 +49,14 @@ class ComprasEnc(BasesModel):
         return '{}'.format(self.observacion)
 
     def save(self):
-        observacion_list = list(self.observacion) # Solo cambia la primera letra
-        observacion_list[0] = observacion_list[0].upper()
-        self.observacion = "".join(observacion_list)
+        if self.observacion:
+            observacion_list = list(self.observacion) # Solo cambia la primera letra
+            observacion_list[0] = observacion_list[0].upper()
+            self.observacion = "".join(observacion_list)
+
+        if self.sub_total == None  or self.descuento == None:
+            self.sub_total = 0
+            self.descuento = 0
             
         self.total = self.sub_total - self.descuento
 
@@ -70,10 +80,50 @@ class ComprasDet(BasesModel):
         return '{}'.format(self.producto)
 
     def save(self):
-        self.sub_total = float(self.cantidad) * self.precio_prv
-        self.total = self.sub_total - self.descuento
+        self.sub_total = float(float(int(self.cantidad)) * float(self.precio_prv))
+        self.total = self.sub_total - float(self.descuento)
         super(ComprasDet, self).save()
     
     class Meta:
         verbose_name_plural = "Detalles de las Compras"
         verbose_name="Detalle de la Compra"
+
+@receiver(post_delete, sender=ComprasDet)
+def compradet_delete(sender, instance, **kwargs):
+    id_producto = instance.producto.id  # Del detalle de la compra, su producto
+    id_compra = instance.compra.id  # Del detalle de la compra, su encabezado de compra
+
+    encabezado = ComprasEnc.objects.filter(pk=id_compra).first() # El registro de compra vinculado al registro del detalle de compra
+
+    if encabezado:
+        sub_total = ComprasDet.objects.filter(compra=id_compra).aggregate(Sum('sub_total'))
+        descuento = ComprasDet.objects.filter(compra=id_compra).aggregate(Sum('descuento'))
+
+        # Actualización del sub_total y el descuento y por ende el total
+        encabezado.sub_total = sub_total['sub_total__sum']
+        encabezado.descuento = descuento['descuento__sum']
+
+        encabezado.save()
+
+    producto = Producto.objects.filter(pk=id_producto).first()# El producto vinculado al registro del detalle de compra
+
+    if producto:
+        cantidad = int(producto.existencia) - int(instance.cantidad)
+        producto.existencia = cantidad
+
+        producto.save()
+
+
+@receiver(post_save, sender=ComprasDet)
+def compradet_save(sender, instance, **kwargs):
+    id_producto = instance.producto.id
+    fecha_compra = instance.compra.fecha_compra
+
+    producto = Producto.objects.filter(pk=id_producto).first()
+    if producto:
+        cantidad = int(producto.existencia) + int(instance.cantidad)
+        producto.existencia = cantidad
+
+        producto.ultima_compra = fecha_compra
+
+        producto.save()

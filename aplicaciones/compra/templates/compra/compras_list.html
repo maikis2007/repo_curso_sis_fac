@@ -41,16 +41,16 @@
                                 {% for item in compras %}
                                 <tr>
                                     <td>{{ item.id }}</td>
-                                    <td>{{ item.fecha_compra|date:"d/m/Y H:i:s" }}</td>
+                                    <td>{{ item.fecha_compra|date:"d/m/Y" }}</td>
                                     <td>{{ item.observacion }}</td>
                                     <td>{{ item.nro_factura }}</td>
-                                    <td>{{ item.fecha_factura|date:"d/m/Y H:i:s" }}</td>
+                                    <td>{{ item.fecha_factura|date:"d/m/Y" }}</td>
                                     <td>{{ item.sub_total }}</td>
                                     <td>{{ item.descuento }}</td>
                                     <td>{{ item.total }}</td>
                                     <td>{{ item.estado|yesno:"Activo, Inactivo" }}</td>
                                     <td>
-                                        <a href="#" class="btn btn-warning btn-circle">
+                                        <a href="{% url 'cmp:compra_edit' item.id %}" class="btn btn-warning btn-circle">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="#" class="btn btn-dark btn-circle">
@@ -60,9 +60,7 @@
                                             <i class="fas fa-thumbs-up"></i>
                                             {% endif %}
                                         </a>
-                                        <a href="#" class="btn btn-danger btn-circle">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
+                                        <a href="#" class=""></a>
                                     </td>   
                                 </tr>
                                 {% endfor %}

@@ -93,9 +93,10 @@ class Producto(BasesModel):
         return '{}'.format(self.descripcion.upper())
     
     def save(self):
-        descripcion_list = list(self.descripcion)
-        descripcion_list[0] = descripcion_list[0].upper()
-        self.descripcion = "".join(descripcion_list)
+        if self.descripcion:
+            descripcion_list = list(self.descripcion)
+            descripcion_list[0] = descripcion_list[0].upper()
+            self.descripcion = "".join(descripcion_list)
 
         super(Producto, self).save()
     

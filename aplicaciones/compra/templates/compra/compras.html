@@ -4,7 +4,7 @@
 
 {% block page_content %}
 
-    <form method="POST" id="formCompras">
+    <form method="POST" id="formCompra">
         {% csrf_token %}
         <!-- Earnings (Annual) Card Example -->
         <div class="col-xl-12 col-md-12 mb-12"> <!-- De 12 -> para qué se vea mejor -->
@@ -129,7 +129,7 @@
                                         </div>
                                         <label for="id_descuento_detalle" class="col-sm-2 col-form-label">Desc.:</label>
                                         <div class="col-sm-2">
-                                            <input type="text" class="form-control" name="id_descuento_detalle" id="id_descuento_detalle" value="00">
+                                            <input type="number" class="form-control" name="id_descuento_detalle" id="id_descuento_detalle" value="00">
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -162,8 +162,7 @@
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                                    <div class="table-responsive"><table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
                                             <thead>
                                                 <th>Producto</th>
                                                 <th>Cantidad</th>
@@ -178,12 +177,12 @@
                                                 <tr>
                                                     <td>{{ item.producto }}</td>
                                                     <td>{{ item.cantidad }}</td>
-                                                    <td>{{ item.precio }}</td>
+                                                    <td>{{ item.precio_prv }}</td>
                                                     <td>{{ item.sub_total }}</td>
                                                     <td>{{ item.descuento }}</td>
                                                     <td>{{ item.total }}</td>
                                                     <td>
-                                                        <a href="#" class="btn btn-danger btn-circle">
+                                                        <a onclick="return abrir_modal('{% url 'cmp:compra_delete' encabezado.pk item.id %}');" class="btn btn-danger btn-circle">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
                                                     </td>   
@@ -208,7 +207,7 @@
     $(function () {
 
         $("#id_fecha_compra, #id_fecha_factura").datetimepicker({
-            format: 'd-m-Y',
+            format: 'Y-m-d',
             timepicker:false
         });
 
@@ -244,6 +243,24 @@
 
         $("#id_cantidad_detalle, #id_precio_detalle, #id_descuento_detalle").change( function () {
             calcular_detalle();
+        });
+
+        $("#formCompra").submit( function (e) {
+
+            if ( $("#id_total_detalle").val() === '0'  ||  $("#id_id_producto").val() === '' ) {
+
+                e.preventDefault(); // Detener envío del POST al Server
+
+                $.alert({
+
+                    type: 'red',
+                    title: '',
+                    content: 'No se ha agregado un producto o no tiene detalle'
+
+                });
+
+            }
+
         });
 
     });

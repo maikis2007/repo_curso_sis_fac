@@ -1,3 +1,4 @@
+from re import template
 from django.shortcuts import redirect, render, HttpResponse
 from django.urls import reverse_lazy
 
@@ -7,6 +8,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 
 from django.views import generic
+
+from django.db.models import Sum
 
 from .models import ComprasDet, ComprasEnc, Proveedor
 from .forms import ProveedorForm, ComprasEncForm
@@ -110,20 +113,20 @@ class ComprasListView(SinPrivilegios, \
 @permission_required('compra.view_comprasenc', login_url='bases:sin_privilegios')
 def compras(request, id_compra=None):
     template = "compra/compras.html"
-    productos = Producto.objects.filter(estado=True)
+    productos = Producto.objects.filter(estado=True) # Filtrado de los Productos para el Detalle
 
     contextos = {}
     form_compra = {}
 
     if request.method == 'GET':
         form_compra = ComprasEncForm()
-        encabezado = ComprasEnc.objects.filter(pk=id_compra).first()
+        encabezado = ComprasEnc.objects.filter(pk=id_compra).first() # Filtado del Encabezado
 
-        if encabezado:
-            detalle = ComprasDet.objects.filter(compra=encabezado)
+        if encabezado: # Editar
+            detalle = ComprasDet.objects.filter(compra=encabezado).all() # Filtrado de los Detalles del Encabezado
 
-            fecha_compra = datetime.date.isoformat(encabezado.fecha_compra)
-            fecha_factura = datetime.date.isoformat(encabezado.fecha_factura)
+            fecha_compra = datetime.date.isoformat(encabezado.fecha_compra) # Buen Formato a las Fechas
+            fecha_factura = datetime.date.isoformat(encabezado.fecha_factura) # del Formulario de Encabezado
 
             registro = {
                 'fecha_compra': fecha_compra,  #
@@ -136,11 +139,103 @@ def compras(request, id_compra=None):
                 'total': encabezado.total
             }
 
-            form_compra = ComprasEncForm(registro)
+            form_compra = ComprasEncForm(registro) # Mostrando Datos del Encabezado
 
-        else:
+        else: # Nuevo
             detalle = None
 
         contextos = {'productos': productos, 'encabezado': encabezado, 'detalle': detalle, 'form_compra': form_compra}
 
-        return render(request, template, contextos)
+    elif request.method == 'POST':
+
+        """
+        El formulario de Encabezado y Detalle de Compra deben de llenarse (son obligatorios)
+        """
+
+        # Seleccionar campos del Encabezado
+        fecha_compra = request.POST.get("fecha_compra")
+        observacion = request.POST.get("observacion")
+        nro_factura = request.POST.get("nro_factura")
+        fecha_factura = request.POST.get("fecha_factura")
+        proveedor = request.POST.get("proveedor")
+        sub_total = 0
+        descuento = 0
+        total = 0
+
+        if not id_compra: # Nuevo
+            proveedor = Proveedor.objects.get(pk=proveedor) # Id del Proveedor del Encabezado Nuevo
+            # Datos del Nuevo Registro
+            encabezado = ComprasEnc(
+                fecha_compra = fecha_compra,
+                observacion = observacion,
+                nro_factura = nro_factura,
+                fecha_factura = fecha_factura,
+                proveedor = proveedor,
+                uc = request.user
+            )
+            
+            if encabezado:
+                encabezado.save() # Guardar cambios, si los Datos están Completos
+
+                id_compra = encabezado.id # Guardar el Id del Encabezado para Editar
+
+        else: # Editar
+            encabezado = ComprasEnc.objects.filter(pk=id_compra).first() # Filtrado del Encabezado
+
+            if encabezado: # Modificación de datos
+                encabezado.fecha_compra = fecha_compra
+                encabezado.observacion = observacion
+                encabezado.nro_factura = nro_factura
+                encabezado.fecha_factura = fecha_factura
+                encabezado.um = request.user.id
+
+                encabezado.save()
+
+        # # Seleccionar campos del Detalle
+        producto = request.POST.get("id_id_producto")
+        cantidad = request.POST.get("id_cantidad_detalle")
+        precio = request.POST.get("id_precio_detalle")
+        sub_total_detalle = request.POST.get("id_sub_total_detalle")
+        descuento_detalle  = request.POST.get("id_descuento_detalle")
+        total_detalle  = request.POST.get("id_total_detalle")
+
+        producto = Producto.objects.get(pk=producto)
+
+        detalle = ComprasDet(
+            compra = encabezado,
+            producto = producto,
+            cantidad = cantidad,
+            precio_prv = precio,
+            sub_total = sub_total_detalle,
+            descuento = descuento_detalle,
+            costo = 0,
+            uc = request.user
+        )
+
+        if detalle:
+            detalle.save()
+
+            sub_total = ComprasDet.objects.filter(compra=id_compra).aggregate(Sum('sub_total'))
+            descuento = ComprasDet.objects.filter(compra=id_compra).aggregate(Sum('descuento'))
+
+            encabezado.sub_total = sub_total["sub_total__sum"]
+            encabezado.descuento = descuento["descuento__sum"]
+
+            encabezado.save()
+
+        # Finalizada la Acción de Nuevo o Editar, Redirigir a Editar
+        return redirect("cmp:compra_edit", id_compra=id_compra)
+
+    return render(request, template, contextos)
+
+class CompraDetDeleteView(SinPrivilegios, generic.DeleteView):
+    permission_required = "cmp.delete_comprasdet"
+    model = ComprasDet
+    template_name = "compra/compra_det_delete.html"
+    context_object_name = "compradet"
+
+    # Se Necesita el Id de la Compra de Encabezado para Redireccionar a Editar Compra
+    def get_success_url(self):
+        id_compra = self.kwargs['id_compra']
+
+        return reverse_lazy('cmp:compra_edit', kwargs={'id_compra': id_compra})

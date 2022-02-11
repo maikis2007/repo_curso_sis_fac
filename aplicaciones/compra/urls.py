@@ -12,5 +12,7 @@ urlpatterns = [
     path('cambiar/estado/proveedor/<int:id_proveedor>', proveedor_estado, name="proveedor_estado"),
 
     path('compras/', ComprasListView.as_view(), name="compras"),
-    path('nueva/compra/', compras, name="compra_new")
+    path('nueva/compra/', compras, name="compra_new"),
+    path('editar/compra/<int:id_compra>', compras, name="compra_edit"),
+    path('compra/<int:id_compra>/eliminar/compradet/<int:pk>', CompraDetDeleteView.as_view(), name="compra_delete")
 ]
