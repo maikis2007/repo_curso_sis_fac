@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de las Compras</title>
+
+    <style>
+        @page {
+            size: letter;
+            margin: 1cm;
+        }
+        .table td .numero {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h4>Sistema de Compra y Facturación con Django 2.2</h4>
+                <h3>Reporte de Compras de hoy ({{ today|date:"d/m/Y" }})</h3>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <th>Nro. Compra</th>
+                            <th>Proveedor</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                        </thead>
+                        <tbody>
+                            {% for item in compras %}
+                            <tr>
+                                <td>{{ item.id }}</td>
+                                <td>{{ item.proveedor }}</td>
+                                <td>{{ item.fecha_compra|date:"d/m/Y" }}</td>
+                                <td>{{ item.total }}</td> 
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

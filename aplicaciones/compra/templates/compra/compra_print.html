@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de las Compras</title>
+
+    <style>
+        @page {
+            size: letter;
+            margin: 1cm;
+        }
+        .table td .numero{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h4>Sistema de Compra y Facturación con Django 2.2</h4>
+            </div>
+
+            <div class="list-group">
+                <p>Nro. Compra: {{ encabezado.id }}</p>
+
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>Proveedor:</td>
+                            <td>{{ encabezado.proveedor }}</td>
+                            <td>Fecha Compra:</td>
+                            <td>{{ encabezado.fecha_compra|date:"d/m/Y" }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nro. Factura:</td>
+                            <td>{{ encabezado.nro_factura }}</td>
+                            <td>Fecha Factura:</td>
+                            <td>{{ encabezado.fecha_factura|date:"d/m/Y" }}</td>
+                        </tr>
+                        <tr>
+                            <td>Observación:</td>
+                            <td colspan="3">{{ encabezado.observacion }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <hr>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>SubTotal</th>
+                    <th>Descuento</th>
+                    <th>Total</th>
+                </thead>
+                <tbody>
+                    {% for item in detalle %}
+                    <tr>
+                        <td><span class="small">{{ item.producto }}</span></td>
+                        <td class="numero">{{ item.cantidad }}</td>
+                        <td class="numero">{{ item.precio_prv }}</td>
+                        <td class="numero">{{ item.sub_total }}</td> 
+                        <td class="numero">{{ item.descuento }}</td>
+                        <td class="numero">{{ item.total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

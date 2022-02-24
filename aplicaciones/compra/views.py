@@ -119,6 +119,7 @@ def compras(request, id_compra=None):
     form_compra = {}
 
     if request.method == 'GET':
+        
         form_compra = ComprasEncForm()
         encabezado = ComprasEnc.objects.filter(pk=id_compra).first() # Filtado del Encabezado
 
@@ -142,6 +143,9 @@ def compras(request, id_compra=None):
             form_compra = ComprasEncForm(registro) # Mostrando Datos del Encabezado
 
         else: # Nuevo
+            if id_compra:
+                return redirect("cmp:compras")
+            
             detalle = None
 
         contextos = {'productos': productos, 'encabezado': encabezado, 'detalle': detalle, 'form_compra': form_compra}
@@ -149,7 +153,7 @@ def compras(request, id_compra=None):
     elif request.method == 'POST':
 
         """
-        El formulario de Encabezado y Detalle de Compra deben de llenarse (son obligatorios)
+        El formulario de Encabezado y Detalle de Compra deben de llenarse con datos válidos (son obligatorios)
         """
 
         # Seleccionar campos del Encabezado
@@ -163,7 +167,7 @@ def compras(request, id_compra=None):
         total = 0
 
         if not id_compra: # Nuevo
-            proveedor = Proveedor.objects.get(pk=proveedor) # Id del Proveedor del Encabezado Nuevo
+            proveedor = Proveedor.objects.get(pk=proveedor) # Seleccionar Proveedor del Encabezado Nuevo
             # Datos del Nuevo Registro
             encabezado = ComprasEnc(
                 fecha_compra = fecha_compra,
@@ -199,7 +203,7 @@ def compras(request, id_compra=None):
         descuento_detalle  = request.POST.get("id_descuento_detalle")
         total_detalle  = request.POST.get("id_total_detalle")
 
-        producto = Producto.objects.get(pk=producto)
+        producto = Producto.objects.get(pk=producto) # Seleccionar el Producto del Detalle Nuevo
 
         detalle = ComprasDet(
             compra = encabezado,
@@ -239,3 +243,39 @@ class CompraDetDeleteView(SinPrivilegios, generic.DeleteView):
         id_compra = self.kwargs['id_compra']
 
         return reverse_lazy('cmp:compra_edit', kwargs={'id_compra': id_compra})
+
+@login_required(login_url='bases:login')
+@permission_required('compra.change_comprasenc', login_url='bases:sin_privilegios')
+def compra_estado(request, id_compra):
+    compra = ComprasEnc.objects.filter(pk=id_compra).first()
+
+    contexto = {}
+    template = "compra/compra_estado.html"
+
+    if not compra:
+        return redirect('cmp:compras')
+    else:
+        if request.method == 'GET':
+            contexto = {'compra': compra}
+
+        elif request.method == 'POST':
+            if compra.estado:
+                compra.estado = False
+            else:
+                compra.estado = True
+            
+            compra.save()
+
+            contexto = {'compra': 'OK'}
+
+            if not compra.estado:
+
+                messages.error(request, "Compra Inactivada Satisfactoriamente")
+
+            else:
+
+                messages.success(request, "Compra Activada Satisfactoriamente")
+            
+            return redirect('cmp:compras')
+
+    return render(request, template, contexto)

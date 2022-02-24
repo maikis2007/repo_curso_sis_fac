@@ -1,17 +1,17 @@
 import os
 from django.conf import settings
 from django.http import HttpResponse
-from django.utils import timezone
 from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.staticfiles import finders
 
 from .models import ComprasEnc, ComprasDet
+from django.utils import timezone
 
 def link_callback(uri, rel):
     """
-    Convert HTML URIs to absolute system paths so xhtml2pdf can access those
-    resources
+     Convierta los URI HTML en rutas absolutas del sistema para que xhtml2pdf pueda acceder a esos
+     recursos
     """
     result = finders.find(uri)
     if result:
@@ -30,7 +30,7 @@ def link_callback(uri, rel):
                     path = os.path.join(sRoot, uri.replace(sUrl, ""))
             else:
                     return uri
-    # make sure that file exists
+    # asegúrese de que ese archivo existe
     if not os.path.isfile(path):
             raise Exception(
                     'media URI must start with %s or %s' % (sUrl, mUrl)
@@ -38,25 +38,59 @@ def link_callback(uri, rel):
     return path
 
 def reporte_compras(request):
-    template = 'cmp/compras_print.html'
+    template = 'compra/compras_print.html'
     today = timezone.now()
 
     compras = ComprasEnc.objects.all()
-    contextos = {'compras': compras, 'today': today, 'request', request}
+    contextos = {'compras': compras, 'today': today, 'request': request}
 
-    # Create a Django response object, and specify content_type as pdf
+    # Cree un objeto de respuesta de Django y especifique content_type como pdf
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; filename="compras_all.pdf"'
+    response['Content-Disposition'] = 'inline; filename="compras_print.pdf"'
     
-    # find the template and render it.
+    # encuentra la plantilla y renderízala.
     template = get_template(template)
     html = template.render(contextos)
 
-    # create a pdf
+    # crear un pdf
     pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
     
-    # if error then show some funy view
+    # si hay un error, muestra una vista divertida
     if pisa_status.err:
-       return HttpResponse('We had some errors <pre>' + html + '</pre>')
-       
+       return HttpResponse('Nosotros tuvimos algunos errores <pre>' + html + '</pre>')
+
+    return response
+
+def imprimir_compra(request, id_compra):
+    template = "compra/compra_print.html"
+    today = timezone.now()
+
+    encabezado = ComprasEnc.objects.filter(id=id_compra).first()
+    if encabezado:
+        detalle = ComprasDet.objects.filter(compra=id_compra)
+    else:
+        detalle = None
+        
+    contextos = {
+       'encabezado': encabezado,
+       'detalle': detalle,
+       'today': today,
+       'request': request
+    }
+    
+    # Cree un objeto de respuesta de Django y especifique content_type como pdf
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="compra_print.pdf"'  # attachment
+    
+    # encuentra la plantilla y renderízala.
+    template = get_template(template)
+    html = template.render(contextos)
+
+    # crear un pdf
+    pisa_status = pisa.CreatePDF(html, dest=response, link_callback=link_callback)
+    
+    # si hay un error, muestra una vista divertida
+    if pisa_status.err:
+       return HttpResponse('Nosotros tuvimos algunos errores <pre>' + html + '</pre>')
+
     return response

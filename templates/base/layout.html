@@ -305,23 +305,19 @@
 
     <!-- Messages from Django -->
     <script>
-            {% if messages %}
-                {% for message in messages %}
-                    console.log("{{ message.tags }}")
-                    mensaje("{{ message }}", "{{ message.tags }}");
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+            {% for message in messages %}
+                console.log("{{ message.tags }}")
+                mensaje("{{ message }}", "{{ message.tags }}");
+            {% endfor %}
+        {% endif %}
     </script>
 
     <!-- jQuery Date Time Picker -->
     <script src="{% static 'vendor/jquery-datetimepicker/jquery.datetimepicker.full.min.js' %}"></script>
 
     <!-- Init jQuery Date Time Picker -->
-    <script>
-        $(document).ready(function(){
-            jQuery.datetimepicker.setLocale('es');
-        })
-    </script>
+    <script src="{% static 'js/init-picker.js' %}"></script>
 
     <!-- Javascript from children templates -->    
     {% block js %} {% endblock js %}
