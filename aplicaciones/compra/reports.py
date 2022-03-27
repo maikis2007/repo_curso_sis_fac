@@ -38,7 +38,7 @@ def link_callback(uri, rel):
     return path
 
 def reporte_compras(request):
-    template = 'compra/compras_print.html'
+    template_path = 'compra/compras_print.html'
     today = timezone.now()
 
     compras = ComprasEnc.objects.all()
@@ -49,7 +49,7 @@ def reporte_compras(request):
     response['Content-Disposition'] = 'inline; filename="compras_print.pdf"'
     
     # encuentra la plantilla y renderízala.
-    template = get_template(template)
+    template = get_template(template_path)
     html = template.render(contextos)
 
     # crear un pdf
@@ -69,7 +69,7 @@ def imprimir_compra(request, id_compra):
     if encabezado:
         detalle = ComprasDet.objects.filter(compra=id_compra)
     else:
-        detalle = None
+        detalle = {}
         
     contextos = {
        'encabezado': encabezado,
@@ -80,7 +80,7 @@ def imprimir_compra(request, id_compra):
     
     # Cree un objeto de respuesta de Django y especifique content_type como pdf
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'inline; filename="compra_print.pdf"'  # attachment
+    response['Content-Disposition'] = 'inline; filename="compra_print.pdf"'
     
     # encuentra la plantilla y renderízala.
     template = get_template(template)

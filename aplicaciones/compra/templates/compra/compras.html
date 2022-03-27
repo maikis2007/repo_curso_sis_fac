@@ -2,9 +2,14 @@
 
 {% load static %}
 
-{% block page_content %}
+{% block movimientos %} active {% endblock movimientos %}
 
-    <form method="POST" id="formCompra">
+{% block collapse2 %} show {% endblock collapse2 %}
+
+{% block compras %} active {% endblock compras %}
+
+{% block page_content %}
+    <form method="POST" id="formCompra"> <!-- Para HTML5 es un solo formulario, pero parecen dos-->
         {% csrf_token %}
         <!-- Earnings (Annual) Card Example -->
         <div class="col-xl-12 col-md-12 mb-12"> <!-- De 12 -> para qué se vea mejor -->
@@ -158,6 +163,7 @@
                                             </a>
                                         </div>
                                     </div>
+                                    
                                 </div>
                             </div>
                             <div class="row">
@@ -183,7 +189,7 @@
                                                     <td>{{ item.descuento }}</td>
                                                     <td>{{ item.total }}</td>
                                                     <td>
-                                                        <a onclick="return abrir_modal('{% url 'cmp:compra_delete' encabezado.pk item.id %}');" class="btn btn-danger btn-circle">
+                                                        <a onclick="return abrir_modal('{% url 'cmp:compra_delete' item.id encabezado.pk %}');" class="btn btn-danger btn-circle">
                                                             <i class="fas fa-trash"></i>
                                                         </a>
                                                     </td>   
@@ -200,7 +206,6 @@
             </div>
         </div>
     </form>
-
 {% endblock page_content %}
 
 {% block js %}
@@ -338,5 +343,4 @@
 
     $("#id_proveedor").focus();
 </script>
-
 {% endblock js %}

@@ -108,8 +108,8 @@ def compradet_delete(sender, instance, **kwargs):
     producto = Producto.objects.filter(pk=id_producto).first()# El producto vinculado al registro del detalle de compra
 
     if producto:
-        cantidad = int(producto.existencia) - int(instance.cantidad)
-        producto.existencia = cantidad
+        cantidadf = int(producto.existencia) - int(instance.cantidad) # existencia final = existencia - cantidad borrada
+        producto.existencia = cantidadf
 
         producto.save()
 
@@ -121,8 +121,8 @@ def compradet_save(sender, instance, **kwargs):
 
     producto = Producto.objects.filter(pk=id_producto).first()
     if producto:
-        cantidad = int(producto.existencia) + int(instance.cantidad)
-        producto.existencia = cantidad
+        cantidadf = int(producto.existencia) + int(instance.cantidad) # existencia final = existencia inicial + cantidad agregada
+        producto.existencia = cantidadf
 
         producto.ultima_compra = fecha_compra
 

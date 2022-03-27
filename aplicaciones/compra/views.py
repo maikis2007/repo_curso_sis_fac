@@ -156,7 +156,7 @@ def compras(request, id_compra=None):
         El formulario de Encabezado y Detalle de Compra deben de llenarse con datos válidos (son obligatorios)
         """
 
-        # Seleccionar campos del Encabezado
+        # Seleccionar campos del Encabezado, mediante el id del HTML
         fecha_compra = request.POST.get("fecha_compra")
         observacion = request.POST.get("observacion")
         nro_factura = request.POST.get("nro_factura")
@@ -169,7 +169,7 @@ def compras(request, id_compra=None):
         if not id_compra: # Nuevo
             proveedor = Proveedor.objects.get(pk=proveedor) # Seleccionar Proveedor del Encabezado Nuevo
             # Datos del Nuevo Registro
-            encabezado = ComprasEnc(
+            encabezado = ComprasEnc( # Modelo ComprasEnc
                 fecha_compra = fecha_compra,
                 observacion = observacion,
                 nro_factura = nro_factura,
@@ -180,6 +180,8 @@ def compras(request, id_compra=None):
             
             if encabezado:
                 encabezado.save() # Guardar cambios, si los Datos están Completos
+
+                messages.success(request, "Compra Creada Satisfactoriamente")
 
                 id_compra = encabezado.id # Guardar el Id del Encabezado para Editar
 
@@ -195,7 +197,11 @@ def compras(request, id_compra=None):
 
                 encabezado.save()
 
-        # # Seleccionar campos del Detalle
+            messages.info(request, "Compra Editada Satisfactoriamente")
+        
+        """ El detalle no puede actualizarse, por ende cuando se haga el método POST del detalle se supone que es porque se quiere crear """
+
+        # # Seleccionar campos del Detalle, mediante el id del HTML
         producto = request.POST.get("id_id_producto")
         cantidad = request.POST.get("id_cantidad_detalle")
         precio = request.POST.get("id_precio_detalle")
@@ -205,7 +211,8 @@ def compras(request, id_compra=None):
 
         producto = Producto.objects.get(pk=producto) # Seleccionar el Producto del Detalle Nuevo
 
-        detalle = ComprasDet(
+        # Datos del nuevo registro
+        detalle = ComprasDet( # Modelo ComprasDet
             compra = encabezado,
             producto = producto,
             cantidad = cantidad,
@@ -216,18 +223,19 @@ def compras(request, id_compra=None):
             uc = request.user
         )
 
-        if detalle:
-            detalle.save()
+        if detalle: # Si el detalle está completo
+            detalle.save() # Guardar cambios
 
-            sub_total = ComprasDet.objects.filter(compra=id_compra).aggregate(Sum('sub_total'))
-            descuento = ComprasDet.objects.filter(compra=id_compra).aggregate(Sum('descuento'))
+            sub_total = ComprasDet.objects.filter(compra=id_compra).aggregate(Sum('sub_total')) # Suma todos los valores del campo sub_total del Detalle relacionado al Encabezado
+            descuento = ComprasDet.objects.filter(compra=id_compra).aggregate(Sum('descuento')) # Igual para el descuento
 
+            # Guarda esos valores para esos campos del Encabezado
             encabezado.sub_total = sub_total["sub_total__sum"]
             encabezado.descuento = descuento["descuento__sum"]
 
-            encabezado.save()
+            encabezado.save() # Guarda los cambios
 
-        # Finalizada la Acción de Nuevo o Editar, Redirigir a Editar
+        # Finalizada la Acción de Nuevo o Editar Encabezado y de Crear Detalle, Redirigir a Editar
         return redirect("cmp:compra_edit", id_compra=id_compra)
 
     return render(request, template, contextos)
@@ -241,7 +249,7 @@ class CompraDetDeleteView(SinPrivilegios, generic.DeleteView):
     # Se Necesita el Id de la Compra de Encabezado para Redireccionar a Editar Compra
     def get_success_url(self):
         id_compra = self.kwargs['id_compra']
-
+        messages.error(self.request, 'Detalle Eliminado Satisfactoriamente')  # mensaje
         return reverse_lazy('cmp:compra_edit', kwargs={'id_compra': id_compra})
 
 @login_required(login_url='bases:login')

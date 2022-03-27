@@ -1,29 +1,30 @@
 <div class="modal-dialog">
     <div class="modal-content">
-        <form action="{% url 'inv:compra_estado' compra.id %}" method="POST">
+        <form action="{% url 'cmp:compra_estado' compra.id %}" method="POST">
             {% csrf_token %}
             <div class="col-xl-12 col-md-12 mb-12">
-                <div class="card {% if compra.estado == True %} border-left-danger {% else %} border-left-success {% endif %} shadow h-100 py-2">
+                <div class="card {% if compra.estado %} border-left-danger {% else %} border-left-success {% endif %} shadow h-100 py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold {% if not compra.estado == True %} text-success {% else %} text-danger {% endif %} text-uppercase mb-1">
-                                    {% if compra.estado == True %}
+                                <div class="text-xs font-weight-bold {% if not compra.estado %} text-success {% else %} text-danger {% endif %} text-uppercase mb-1">
+                                    {% if compra.estado %}
                                         ¿Desea inactivar 
                                     {% else %}
                                         ¿Desea activar
                                     {% endif %}
-                                    <strong>{{ compra.descripcion }}</strong>?
+                                    la compra 
+                                    <strong>{{ compra.id }}</strong>?
                                 </div>
-                                <button type="submit" class="btn {% if compra.estado == True %} btn-danger {% else %} btn-success {% endif %}">
+                                <button type="submit" class="btn {% if compra.estado %} btn-danger {% else %} btn-success {% endif %}">
                                     <span class="fa fa-save"></span>
-                                    {% if compra.estado == True %}
+                                    {% if compra.estado %}
                                         Inactivar
                                     {% else %}
                                         Activar
                                     {% endif %}
                                 </button>
-                                <button type="button" class="btn {% if compra.estado == True %} btn-success {% else %} btn-danger {% endif %}" onclick="return cerrar_modal()">
+                                <button type="button" class="btn {% if compra.estado %} btn-success {% else %} btn-danger {% endif %}" onclick="return cerrar_modal()">
                                     <span class="fa fa-undo"></span>
                                     Cancelar
                                 </button>

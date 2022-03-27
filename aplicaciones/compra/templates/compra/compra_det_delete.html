@@ -1,6 +1,7 @@
 <div class="modal-dialog">
     <div class="modal-content">
-        <form action="{% url 'cmp:compra_delete' compradet.compra.id compradet.pk %}" method="POST" class="form-inline"> <!-- Le pongo acción para saber que plantilla es la que va a renderizar -->
+        <!--                                     id del detalle  id de la compra de detalle-->
+        <form action="{% url 'cmp:compra_delete' compradet.pk compradet.compra.id %}" method="POST" class="form-inline"> <!-- Le pongo acción para saber que plantilla es la que va a renderizar -->
             {% csrf_token %}
             <div class="col-xl-12 col-md-12 mb-12">
                 <div class="card border-left-danger shadow h-100 py-2">

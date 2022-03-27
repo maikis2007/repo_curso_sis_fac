@@ -46,10 +46,12 @@
                                         {% csrf_token %}
 
                                         <div class="form-group">
+                                            {#{ form.username }#}
                                             <input type="text" name="username" id="id_username" class="form-control form-control-user" placeholder="Ingrese el Usuario" autofocus required>
                                         </div>
 
                                         <div class="form-group">
+                                            {#{ form.password }#}
                                             <input type="password" name="password" id="id_password" class="form-control form-control-user" placeholder="Ingrese la Contraseña">
                                         </div>
 

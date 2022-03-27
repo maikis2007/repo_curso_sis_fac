@@ -4,49 +4,68 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listado de las Compras</title>
+    <title>Listado de las Compra</title>
 
     <style>
         @page {
             size: letter;
             margin: 1cm;
         }
-        .table td .numero {
+        .tabla {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 5px;
+        background-color: #fff;
+        }
+        .tabla th,
+        .tabla td {
+            padding: 5px;
+            vertical-align: top;
+            border-top: 1px solid #000;
             text-align: center;
+        }
+        .tabla thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #000;
+        }
+        .tabla tbody + tbody {
+            border-top: 2px solid #000;
+        }
+        .tabla .tabla {
+            background-color: #fff;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <div class="card-header">
+    <div>
+        <div>
+            <div>
                 <h4>Sistema de Compra y Facturación con Django 2.2</h4>
                 <h3>Reporte de Compras de hoy ({{ today|date:"d/m/Y" }})</h3>
             </div>
 
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
-                        <thead>
-                            <th>Nro. Compra</th>
-                            <th>Proveedor</th>
-                            <th>Fecha</th>
-                            <th>Total</th>
-                        </thead>
-                        <tbody>
-                            {% for item in compras %}
-                            <tr>
-                                <td>{{ item.id }}</td>
-                                <td>{{ item.proveedor }}</td>
-                                <td>{{ item.fecha_compra|date:"d/m/Y" }}</td>
-                                <td>{{ item.total }}</td> 
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <div>
+                <table class="tabla">
+                    <thead>
+                        <th>Nro. Compra</th>
+                        <th>Proveedor</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                    </thead>
+                    <tbody>
+                        {% for item in compras %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.proveedor }}</td>
+                            <td>{{ item.fecha_compra|date:"d/m/Y" }}</td>
+                            <td>{{ item.total }}</td> 
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+    <!--<p>{#{ request }#}</p>-->
 </body>
 </html>
