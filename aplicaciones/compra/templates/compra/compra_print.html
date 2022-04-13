@@ -21,11 +21,11 @@
     <div class="container">
         <div class="card">
             <div class="card-header">
-                <h4>Sistema de Compras DEBS</h4>
+                <h4>TICOM</h4>
             </div>
 
             <div class="list-group">
-                <p>No. Compra: {{ encabezado.id}} </p>
+                <p>Nro. Compra: {{ encabezado.id}} </p>
                 <table class="">
                     <tbody>
                         <tr>
@@ -35,14 +35,20 @@
                             <td>{{ encabezado.fecha_compra|date:"d/m/Y"}}</td>
                         </tr>
                         <tr>
-                            <td>No. Factura</td>
+                            <td>Nro. Factura</td>
                             <td>{{encabezado.nro_factura}}</td>
                             <td>Fecha Factura:</td>
                             <td>{{ encabezado.fecha_factura|date:"d/m/Y"}}</td>
                         </tr>
                         <tr>
                             <td>Observación:</td>
-                            <td colspan="3">{{ encabezado.observacion }}</td>
+                            <td colspan="3">
+                                {% if observacion %}
+                                    {{ encabezado.observacion }}
+                                {% else %}
+                                    (No hay Observación)
+                                {% endif %}
+                            </td>
                         </tr>
                     </tbody>
                 </table>

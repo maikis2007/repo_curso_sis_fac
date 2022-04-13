@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'aplicaciones.inventario',
     'aplicaciones.compra',
     'aplicaciones.facturacion',
+    'django_userforeignkey',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_userforeignkey.middleware.UserForeignKeyMiddleware',
 ]
 
 ROOT_URLCONF = 'proyecto.urls'
@@ -82,7 +84,7 @@ DATABASES = {
         'HOST': 'localhost',
         'USER': 'maik',
         'PASSWORD': '123456',
-        'PORT': 5435
+        'PORT': 5435,
     }
 }
 

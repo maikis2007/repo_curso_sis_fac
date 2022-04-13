@@ -197,7 +197,7 @@ def compras(request, id_compra=None):
 
                 encabezado.save()
 
-            messages.info(request, "Compra Editada Satisfactoriamente")
+                messages.info(request, "Compra Editada Satisfactoriamente")
         
         """ El detalle no puede actualizarse, por ende cuando se haga el método POST del detalle se supone que es porque se quiere crear """
 

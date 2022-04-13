@@ -1,0 +1,115 @@
+{% extends 'base/layout.html' %}
+
+{% load static %}
+
+{% block catalogos %} active {% endblock catalogos %}
+
+{% block collapse %} show {% endblock collapse %}
+
+{% block cliente %} active {% endblock cliente %}
+
+{% block page_content %}
+    <div class="col-lg-12">
+        {% if clientes %}
+            <!-- Dropdown Card Example -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-4 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Listado de los Clientes</h6>
+                </div>
+                <div class="card-body">
+                    <div class="buttons-toolbar pb-3">
+                        <a onclick="return abrir_modal('{% url 'fac:cliente_new' %}')" class="btn btn-success">
+                            <span class="fas fa-external-link-alt"></span>
+                            Nuevo Cliente
+                        </a>
+                    </div>
+                    <table id="table" data-toggle="table" data-pagination="true" data-search="true" data-show-columns="true" data-show-toggle="true" data-show-fullscreen="true"
+                        data-toolbar=".buttons-toolbar" data-locale="es-MX">
+                        <thead>
+                            <th data-field="id" data-sortable="true">Id</th>
+                            <th data-field="nombres" data-sortable="true">Nombres</th>
+                            <th data-field="apellidos" data-sortable="true">Apellidos</th>
+                            <th data-field="tipo" data-sortable="true">Tipo</th>
+                            <th data-field="celular" data-sortable="true">Celular</th>
+                            <th data-field="estado" data-sortable="true">Estado</th>
+                            <th class="all">Acciones</th>
+                        </thead>
+                        <tbody>
+                            {% for item in clientes %}
+                            <tr>
+                                <td>{{ item.id }}</td>
+                                <td>{{ item.nombres }}</td>
+                                <td>{{ item.apellidos }}</td>
+                                <td>{{ item.tipo }}</td>
+                                <td>{{ item.celular }}</td>
+                                <td>
+                                    <div onclick="return inactivar({{ item.id }});" class="d-flex justify-content-center">
+                                        {% if item.estado %}
+                                        <i class="far fa-thumbs-up text-primary"></i>
+                                        {% else %}
+                                        <i class="far fa-thumbs-down text-danger"></i>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <a onclick="return abrir_modal('{% url 'fac:cliente_edit' item.id %}')" class="btn btn-warning btn-circle">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a onclick="return abrir_modal('{# url 'fac:cliente_delete' item.id #}')" class="btn btn-danger btn-circle">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>   
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+        <!-- Default Card Example -->
+            <div class="card mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold">Listado de los Clientes</h6>
+                    <div class="dropdown no-arrow">
+                        <a onclick="return abrir_modal('{% url 'fac:cliente_new' %}')" class="btn btn-success">
+                            <span class="fas fa-external-link-alt"></span>
+                            Nuevo Cliente
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    Aún no hay clientes en el sistema
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock page_content %}
+
+{% block js %}
+    <script>
+        function inactivar(id){
+            var data = {id: id};
+            data = JSON.stringify(data);  // "{"id": 1}"   "{"id": 5}"   "{"id": 9}"
+            var token = '{{ csrf_token }}';  // Código
+
+            $.ajax({
+                headers: {"X-CSRFToken": token},
+                type: "POST",
+                url: "/fac/estado/cliente/" + id,
+                data: data,
+                success: function(response) {
+                    if (response === 'OK') {
+                        location.reload(true);
+                    } else {
+                        mensaje("Error intentando cambiar el estado del cliente");
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrow){
+                    console.log(textStatus, errorThrow);
+                    mensaje(errorThrow,'red');
+                    cerrar_modal();
+                }
+            });
+        }
+    </script>
+{% endblock js %}

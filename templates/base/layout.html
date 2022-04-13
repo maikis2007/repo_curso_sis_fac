@@ -40,6 +40,13 @@
     <link rel="preload" href="{% static 'vendor/jquery-datetimepicker/jquery.datetimepicker.css' %}" as="style">
     <link href="{% static 'vendor/jquery-datetimepicker/jquery.datetimepicker.css' %}" rel="stylesheet">
 
+    <!-- Bootstrap-Table -->
+    <link rel="preload" href="{% static 'vendor/bootstrap-table/bootstrap-table.min.css' %}" as="style">
+    <link href="{% static 'vendor/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+
+    <!-- Select 2 -->
+    <link rel="preload" href="{% static 'vendor/select2/select2.min.css' %}" as="style">
+    <link href="{% static 'vendor/select2/select2.min.css' %}" rel="stylesheet">
 </head>
 
 <body id="page-top" class="bg-gradient-primary">
@@ -106,6 +113,10 @@
                         {% if perms.compra.view_proveedor %}
                         <a class="collapse-item {% block proveedor %} {% endblock proveedor %}" href="{% url 'cmp:proveedores' %}">Proveedores</a>
                         {% endif %}
+                        <h6 class="collapse-header">Facturación</h6>
+                        {% if perms.facturacion.view_cliente %}
+                        <a class="collapse-item {% block cliente %} {% endblock cliente %}" href="{% url 'fac:clientes' %}">Clientes</a>
+                        {% endif %}
                     </div>
                 </div>
             </li>
@@ -122,6 +133,10 @@
                         <h6 class="collapse-header">Entradas</h6>
                         {% if perms.compra.view_comprasenc %}                        
                         <a class="collapse-item {% block compras %} {% endblock compras %}" href="{% url 'cmp:compras' %}">Compras</a>
+                        {% endif %}
+                        <h6 class="collapse-header">Salidas</h6>
+                        {% if perms.compra.view_comprasenc %}                        
+                        <a class="collapse-item {% block facturas %} {% endblock facturas %}" href="{% url 'fac:facturas' %}">Facturas</a>
                         {% endif %}
                     </div>
                 </div>
@@ -318,6 +333,15 @@
 
     <!-- Init jQuery Date Time Picker -->
     <script src="{% static 'js/init-picker.js' %}"></script>
+
+    <!-- Bootstrap-Table -->
+    <script src="{% static 'vendor/bootstrap-table/bootstrap-table.min.js' %}"></script>
+
+    <!-- Bootstrap-Table Locale -->
+    <script src="{% static 'vendor/bootstrap-table/bootstrap-table-locale-all.min.js' %}"></script>
+
+    <!-- Select 2 -->
+    <script src="{% static 'vendor/select2/select2.min.js' %}"></script>
 
     <!-- Javascript from children templates -->    
     {% block js %} {% endblock js %}
