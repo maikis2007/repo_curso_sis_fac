@@ -207,138 +207,98 @@
 {% endblock page_content %}
 
 {% block js %}
-<script>
-    $(function () {
+    <script src="{% static 'js/calcular_detalle.js' %}"></script>
+    
+    <script>
+        $(function () {
 
-        $("#id_fecha_compra, #id_fecha_factura").datetimepicker({
-            format: 'Y-m-d',
-            timepicker:false
-        });
+            $("#id_fecha_compra, #id_fecha_factura").datetimepicker({
+                format: 'Y-m-d',
+                timepicker:false
+            });
 
-        $("#sidebarToggle").click();
+            $("#sidebarToggle").click();
 
-        $('.table').DataTable({
-            "pageLength": 2,
-            "language": {
-                "sProcessing": "Procesando...",
-                "sLengthMenu": "Mostrar _MENU_ registros",
-                "sZeroRecords": "No se encontraron resultados",
-                "sEmptyTable": "Ningún dato disponible en esta tabla",
-                "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
-                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-                "sInfoPostFix": "",
-                "sSearch": "Buscar:",
-                "sUrl": "",
-                "sInfoThousands": ",",
-                "sLoadingRecords": "Cargando...",
-                "oPaginate": {
-                    "sFirst": "<span class='fa fa-angle-double-left'></span>",
-                    "sLast": "<span class='fa fa-angle-double-right'></span>",
-                    "sNext": "<span class='fa fa-angle-right'></span>",
-                    "sPrevious": "<span class='fa fa-angle-left'></span>"
-                },
-                "oAria": {
-                    "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
-                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            $('.table').DataTable({
+                "pageLength": 2,
+                "language": {
+                    "sProcessing": "Procesando...",
+                    "sLengthMenu": "Mostrar _MENU_ registros",
+                    "sZeroRecords": "No se encontraron resultados",
+                    "sEmptyTable": "Ningún dato disponible en esta tabla",
+                    "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix": "",
+                    "sSearch": "Buscar:",
+                    "sUrl": "",
+                    "sInfoThousands": ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst": "<span class='fa fa-angle-double-left'></span>",
+                        "sLast": "<span class='fa fa-angle-double-right'></span>",
+                        "sNext": "<span class='fa fa-angle-right'></span>",
+                        "sPrevious": "<span class='fa fa-angle-left'></span>"
+                    },
+                    "oAria": {
+                        "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
                 }
-            }
-        });
+            });
 
-        $("#id_cantidad_detalle, #id_precio_detalle, #id_descuento_detalle").change( function () {
-            calcular_detalle();
-        });
+            $("#formCompra").submit( function (e) {
 
-        $("#formCompra").submit( function (e) {
+                if ( $("#id_total_detalle").val() === '0'  ||  $("#id_id_producto").val() === '' ) {
 
-            if ( $("#id_total_detalle").val() === '0'  ||  $("#id_id_producto").val() === '' ) {
+                    e.preventDefault(); // Detener envío del POST al Server
 
-                e.preventDefault(); // Detener envío del POST al Server
+                    $.alert({
 
-                $.alert({
+                        type: 'red',
+                        title: '',
+                        content: 'No se ha agregado un producto o no tiene detalle'
 
-                    type: 'red',
-                    title: '',
-                    content: 'No se ha agregado un producto o no tiene detalle'
+                    });
 
-                });
+                }
 
-            }
+            });
 
         });
 
-    });
+        function selectProduct(id, descripcion) { // Seleccionar Producto para el Detalle de Compra
+            /*
+            $("#id_cantidad_detalle").val(0);
+            $("#id_precio_detalle").val(0);
+            $("#id_descuento_detalle").val(0);
 
-    function selectProduct(id, descripcion) { // Seleccionar Producto para el Detalle de Compra
-        /*
-        $("#id_cantidad_detalle").val(0);
-        $("#id_precio_detalle").val(0);
-        $("#id_descuento_detalle").val(0);
+            $("#id_sub_total_detalle").val(0);
+            $("#id_total_detalle").val(0);
+            */
 
-        $("#id_sub_total_detalle").val(0);
-        $("#id_total_detalle").val(0);
-        */
+            $("#id_id_producto").val(id);
+            $("#id_descripcion_producto").val(descripcion);
+            $("#id_cantidad_detalle").focus();
+            $("#id_cantidad_detalle").select(); // Dar TAB para rellenar
 
-        $("#id_id_producto").val(id);
-        $("#id_descripcion_producto").val(descripcion);
-        $("#id_cantidad_detalle").focus();
-        $("#id_cantidad_detalle").select(); // Dar TAB para rellenar
+            //$('.table').DataTable().search('').draw();
+        }
 
-        //$('.table').DataTable().search('').draw();
-    }
+        function clear_detail(){ // Limpiar Detalle
+            $("#id_cantidad_detalle").val(0);
+            $("#id_precio_detalle").val(0);
+            $("#id_descuento_detalle").val(0);
 
-    function calcular_detalle() { // Calcular el Detalle
+            $("#id_sub_total_detalle").val(0);
+            $("#id_total_detalle").val(0);
 
-        var cant,prec,desc,stotal,total;
+            $("#id_id_producto").val('');
+            $("#id_descripcion_producto").val('');
 
-        cantidad = $("#id_cantidad_detalle").val();
-        precio = $('#id_precio_detalle').val();
-        descuento = $('#id_descuento_detalle').val();
-
-        // Mismas Comprobaciones hasta Descuento
-
-        cantidad = cantidad === "" ? 0 : cantidad;
-        cantidad = cantidad < 0 ? 0 : cantidad;
-
-        precio = precio === "" ? 0 : precio;
-        precio = precio < 0 ? 0 : precio;
-
-        descuento = descuento === "" ? 0 : descuento;
-        descuento = descuento < 0 ? 0 : descuento;
-
-        // Comprobación del Descuento
-
-        descuento = descuento >= (cantidad * precio) ? 0 : descuento;
-
-        // Luego de las Comprobaciones, vienen las Afirmaciones
-        
-        subtotal = cantidad * precio;
-        total = subtotal - descuento;
-
-        // Mostrar datos calculados
-
-        $("#id_catidad_detalle").val(cantidad);
-        $("#id_precio_detalle").val(precio);
-        $("#id_descuento_detalle").val(descuento);
-        $("#id_sub_total_detalle").val(subtotal);
-        $("#id_total_detalle").val(total);
-
-    }
-
-    function clear_detail(){ // Limpiar Detalle
-        $("#id_cantidad_detalle").val(0);
-        $("#id_precio_detalle").val(0);
-        $("#id_descuento_detalle").val(0);
-
-        $("#id_sub_total_detalle").val(0);
-        $("#id_total_detalle").val(0);
-
-        $("#id_id_producto").val('');
-        $("#id_descripcion_producto").val('');
+            $("#id_proveedor").focus();
+        }
 
         $("#id_proveedor").focus();
-    }
-
-    $("#id_proveedor").focus();
-</script>
+    </script>
 {% endblock js %}

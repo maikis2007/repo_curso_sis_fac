@@ -83,8 +83,7 @@ class Producto(BasesModel):
 
     descripcion = models.CharField(max_length=350)
 
-    precioc = models.FloatField(default=0)
-    preciov = models.FloatField(default=0)
+    precio = models.FloatField(default=0)
 
     existencia = models.IntegerField(default=0)
     ultima_compra = models.DateField(null=True, blank=True)

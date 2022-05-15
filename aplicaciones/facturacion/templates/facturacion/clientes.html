@@ -55,7 +55,7 @@
                                     <a onclick="return abrir_modal('{% url 'fac:cliente_edit' item.id %}')" class="btn btn-warning btn-circle">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a onclick="return abrir_modal('{# url 'fac:cliente_delete' item.id #}')" class="btn btn-danger btn-circle">
+                                    <a onclick="return abrir_modal('{% url 'fac:cliente_delete' item.id %}')" class="btn btn-danger btn-circle">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </td>   
@@ -91,6 +91,8 @@
             var data = {id: id};
             data = JSON.stringify(data);  // "{"id": 1}"   "{"id": 5}"   "{"id": 9}"
             var token = '{{ csrf_token }}';  // Código
+
+            // console.log(data, token);
 
             $.ajax({
                 headers: {"X-CSRFToken": token},

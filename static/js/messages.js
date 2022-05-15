@@ -1,8 +1,12 @@
 function mensaje(msg, color='green') {
     if (color == 'success'){
         color = 'green';
+    
+    
     } else if (color == 'info'){
         color = 'orange';
+    
+    
     } else if (color == 'error'){
         color = 'red';
     }

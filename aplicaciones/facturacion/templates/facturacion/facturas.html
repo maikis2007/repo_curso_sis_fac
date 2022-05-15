@@ -23,10 +23,10 @@
                             <!-- Sección Izquierda -->
                             <div class="col-lg-6 form-group">
                                 <div class="content">
-                                    <div class="row ">
-                                        <div class="col-lg-1">Nro.:</div>
+                                    <div class="row">
+                                        <div class="col-lg-1">No.:</div>
                                         <div class="col-lg-4">
-                                            <input type="text" name="encabezado_id" id="encabezado_id" readonly class="form-control">
+                                            <input type="text" name="encabezado_id" id="id_encabezado_id" readonly class="form-control">
                                         </div>
                                         <div class="col-lg-2">
                                             Cliente:
@@ -34,7 +34,7 @@
                                         <div class="col-lg-5 form-group">
                                             <div class="row">
                                                 <div class="col-lg-11 col-md-11">
-                                                    <select name="encabezado_cliente" id="encabezado_cliente" class="form-control">
+                                                    <select name="encabezado_cliente" id="id_encabezado_cliente" class="form-control">
                                                         <option value="0">Seleccione Cliente</option>
                                                         {% for item in clientes %}
                                                             <option value="{{ item.id }}">{{ item.nombres }} {{item.apellidos}}</option>
@@ -55,7 +55,7 @@
                                                     Fecha:
                                                 </div>
                                                 <div class="col-lg-8 form-group">
-                                                    <input type="text" name="fecha" id="fecha" class="form-control form-control-user" 
+                                                    <input type="text" name="fecha" id="id_fecha" class="form-control form-control-user" 
                                                     value="{{ encabezado.fecha|date:'Y-m-d' }}" readonly />
                                                 </div>
                                             </div>
@@ -65,21 +65,21 @@
                                                 <div class="col-lg-3">Sub Total:</div>
                                                 <div class="col-lg-8">
                                                     <input type="number" class="form-control text-right" value="0.00" readonly
-                                                    name="sub_total" id="sub_total">
+                                                    name="sub_total" id="id_sub_total">
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-lg-3">Descuento:</div>
                                                 <div class="col-lg-8">
                                                     <input type="number" class="form-control text-right" value="0.00" disabled
-                                                        name="descuento" id="descuento">
+                                                        name="descuento" id="id_descuento">
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-lg-3">Total:</div>
                                                 <div class="col-lg-8">
                                                     <input type="number" class="form-control text-right" value="0.00" disabled
-                                                        name="total" id="total">
+                                                        name="total" id="id_total">
                                                 </div>
                                             </div>
                                         </div>
@@ -92,12 +92,12 @@
                             <!-- Sección Derecha -->
                             <div class="col-lg-6 from-group">
                                 <div class="row p-2">
-                                    <div class="col-lg-1">Cód.</div>
+                                    <div class="col-lg-1">Cod.</div>
                                     <div class="col-lg-3">
-                                        <input type="text" class="form-control" name="codigo" id="codigo" placeholder="Cód. Producto">
+                                        <input type="text" class="form-control" name="codigo" id="id_codigo" placeholder="Cód. Producto">
                                     </div>
                                     <div class="col-lg-7">
-                                        <input type="text" class="form-control" name="descripcion" id="descripcion" placeholder="Descripción" disabled>
+                                        <input type="text" class="form-control" name="descripcion" id="id_descripcion" placeholder="Descripción" disabled>
                                     </div>
                                     <div class="col-lg-1">
                                         <button type="button" class="btn btn-info" id="btnBuscar">
@@ -108,30 +108,30 @@
                                 <div class="row">
                                     <div class="col-lg-1">Cant.</div>
                                     <div class="col-lg-3">
-                                        <input type="number" class="form-control" name="cantidad" id="cantidad" placeholder="Cantidad">
-                                        <input type="hidden" class="form-control" name="existencabezadoia" id="existencabezadoia">
+                                        <input type="number" class="form-control" name="cantidad" id="id_cantidad_detalle" placeholder="Cantidad">
+                                        <input type="hidden" class="form-control" name="existencabezadoia" id="id_existencabezadoia">
                                     </div>
                                     <div class="col-lg-4">
-                                        <input type="number" class="form-control" name="precio" id="precio" placeholder="Precio" readonly>
+                                        <input type="number" class="form-control" name="precio" id="id_precio_detalle" placeholder="Precio" readonly>
                                     </div>
                                     <div class="col-lg-3">
-                                        <input type="number" class="form-control" name="descuento_detalle" id="descuento_detalle" placeholder="Descuento">
+                                        <input type="number" class="form-control" name="descuento_detalle" id="id_descuento_detalle" placeholder="Descuento">
                                     </div>
                                     <div class="col-lg-1">
                                         <button type="submit" class="btn btn-danger" id="btnGuardar"> <i class="far fa-plus-square"></i> </button>
                                     </div>
                                 </div>
-                                <div class="row p-1">
+                                <div class="row p-2">
                                     <div class="col-lg-9 text-right">Sub Total</div>
                                     <div class="col-lg-3">
-                                        <input type="number" class="form-control" name="sub_total_detalle" id="sub_total_detalle" placeholder="Sub Total"
+                                        <input type="number" class="form-control" name="sub_total_detalle" id="id_sub_total_detalle" placeholder="Sub Total"
                                         value="0.00" disabled>
                                     </div>
                                 </div>
-                                <div class="row p-1">
+                                <div class="row p-2">
                                     <div class="col-lg-9 text-right">Total</div>
                                     <div class="col-lg-3">
-                                        <input type="number" class="form-control" name="total_detalle" id="total_detalle" placeholder="Total"
+                                        <input type="number" class="form-control" name="total_detalle" id="id_total_detalle" placeholder="Total"
                                         value="0.00" disabled>
                                     </div>
                                 </div>
@@ -166,8 +166,8 @@
                                         {% for item in detalle %}
                                         <tr>
                                             <td>{{ item.id }}</td>
+                                            <td>{{ item.producto.codigo }}</td>
                                             <td>{{ item.producto }}</td>
-                                            <td>{{ item.producto.descripcion }}</td>
                                             <td>{{ item.cantidad }}</td>
                                             <td>{{ item.sub_total }}</td>
                                             <td>{{ item.descuento }}</td>
@@ -192,13 +192,95 @@
 {% endblock %}
 
 {% block js %}
+    <script src="{% static 'js/calcular_detalle.js' %}"></script>
+
     <script>
-        $(function(){
+        $(function() {
             $("#sidebarToggle").click();
-            $("#encabezado_cliente").select2({
+
+            $("#id_encabezado_cliente").select2({
                 placeholder: "Seleccione Cliente",
                 allowClear: true
             });
+
+            $("#btnBuscar").click(function(e) {
+                if ($("#id_encabezado_cliente").val() === '0') {
+                    mensaje("Cliente no seleccionado", "red");
+
+                    return false;
+                }
+
+                abrir_modal("{% url 'fac:factura_producto' %}");
+            });
+
+            $("#id_codigo").keypress(function(e) {
+                if (e.keyCode === 13) {
+                    e.preventDefault();
+                    buscarProducto();
+                }
+            });
+            
+            $("#id_encabezado_id").val("{{ encabezado.id }}");
+            $("#id_encabezado_cliente").val("{{ encabezado.cliente.id }}").change();
+            $("#id_fecha").val("{{ encabezado.fecha|date:'Y-m-d' }}");
+            $("#id_sub_total").val("{{ encabezado.sub_total }}");
+            $("#id_descuento").val("{{ encabezado.descuento }}");
+            $("#id_total").val("{{ encabezado.total }}");
         });
+
+        function limpiarProducto() {
+            $('#id_codigo').val("");
+            $('#id_descripcion').val("");
+            $('#id_precio').val("0.00");
+            $('#id_codigo').focus();
+        }
+
+        function buscarProducto() {
+            let codigo = $("#id_codigo").val();
+            let path = "{% url 'api:productos' %}" + codigo; // {# url 'api:producto_detalle' codigo #}
+
+            if ( $("#id_encabezado_cliente").val() === "0" || $("#id_encabezado_cliente").val() === null ) {
+                mensaje("Cliente No Seleccionado", "red");
+
+                return false;  // Termina el programa
+            }
+
+            if (codigo === "") {
+
+                return false;
+            }
+
+            $.ajax({
+                type: "GET",
+                url: path,
+                success: function(result) {  // Se obtuvo el registro
+                    /*
+                    console.log(result);
+                    console.log(result.existencia);
+                    console.log(result.estado);
+                    */
+
+                    if(result.existencia <= 0 || !result.estado) {
+                        mensaje("Producto No Tiene Existencia o está Inactivo", "orange");
+                        limpiarProducto();
+
+                        return false;
+                    }
+
+                    $('#id_codigo').val(result.codigo);
+                    $('#id_descripcion').val(result.descripcion);
+                    $('#id_precio_detalle').val(result.precio);
+                    $('#id_cantidad_detalle').focus();
+                },
+                error: function(a, b, c) {  // No se obtuvo un registro
+                    /*console.log(a);*/
+
+                    if (a.status == 404) {
+                        mensaje("Producto -" + codigo + "- No Encontrado o No Existe", "red");
+                        limpiarProducto();
+                    }
+                }
+            });
+        }
     </script>
 {% endblock %}

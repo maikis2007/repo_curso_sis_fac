@@ -3,6 +3,12 @@ from django.db import models
 from aplicaciones.bases.models import BasesModel, BasesModel2
 from aplicaciones.inventario.models import Producto
 
+# Para los signals
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+from django.db.models import Sum
+
 # Create your models here.
 
 class Cliente(BasesModel):
@@ -45,22 +51,24 @@ class FacturaEnc(BasesModel2):
         verbose_name = "Encabezado de la Factura"
 
 class FacturaDet(BasesModel2):
-    factura = models.ForeignKey(FacturaEnc, on_delete=models.CASCADE)
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    cantidad = models.BigIntegerField(default=0)
-    precio = models.FloatField(default=0)
-    sub_total = models.FloatField(default=0)
-    descuento = models.FloatField(default=0)
-    total = models.FloatField(default=0)
+    factura = models.ForeignKey(FacturaEnc,on_delete=models.CASCADE)
+    producto=models.ForeignKey(Producto,on_delete=models.CASCADE)
+    cantidad=models.BigIntegerField(default=0)
+    precio=models.FloatField(default=0)
+    sub_total=models.FloatField(default=0)
+    descuento=models.FloatField(default=0)
+    total=models.FloatField(default=0)
 
     def __str__(self):
         return '{}'.format(self.producto)
-    
-    def save(self):
-        self.sub_total = float(float(int(self.cantidad)) * float(self.precio_prv))
-        self.total = self.sub_total - float(self.descuento)
-        super(FacturaEnc, self).save()
 
+    def save(self):
+        self.sub_total = float(float(int(self.cantidad)) * float(self.precio))
+        self.total = self.sub_total - float(self.descuento)
+        super(FacturaDet, self).save()
+    
     class Meta:
-        verbose_name_plural = "Detalle de las Facturas"
+        verbose_name_plural = "Detalles de las Facturas"
         verbose_name = "Detalle de la Factura"
+
+#@receiver(post_save, sender=ComprasDet)

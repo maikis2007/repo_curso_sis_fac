@@ -1,0 +1,80 @@
+<div class="modal-dialog modal-lg"> <!-- Largo y -->
+    <div class="modal-content">
+        <!-- Earnings (Annual) Card Example -->
+        <div class="col-xl-12 col-md-12 mb-12"> <!-- De 12 -> para qué se vea mejor -->
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                    Buscar Producto
+                                </div>
+                                <div class="row">
+                                    <table id="tableProducto" data-pagination="true" data-search="true" data-show-column="true" data-show-fullscreen="true"
+                                        data-locale="es-MX">
+                                        <thead>
+                                            <th data-sortable="true" data-field="id">Id</th>
+                                            <th data-sortable="true" data-field="codigo">Cod.</th>
+                                            <th data-sortable="true" data-field="codigo_barra">Cod. Barra</th>
+                                            <th data-field="descripcion">Descripción</th>
+                                            <th data-field="existencia">Existencia</th>
+                                            <th data-field="preciov">Precio</th>
+                                            <th class="all">Acciones</th>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in productos %}
+                                            <tr>
+                                                <td>{{ item.id }}</td>
+                                                <td>{{ item.codigo }}</td>
+                                                <td>{{ item.codigo_barra }}</td>
+                                                <td>{{ item.descripcion }}</td>
+                                                <td>{{ item.existencia }}</td>
+                                                <td>{{ item.precio }}</td>
+                                                <td>
+                                                    {% if item.existencia > 0 and item.estado %}
+                                                    <button class="btn btn-warning btn-circle" id="btnSelect" onclick="return seleccionarProducto({{ item.id }}, '{{ item.codigo }}', 
+                                                    '{{ item.descripcion }}', {{ item.precio }})">
+                                                        <i class="far fa-hand-pointer"></i>
+                                                    </button>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <button type="button" id="btnCancelar" class="btn btn-danger">
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        $('#btnCancelar').click(function(e) {
+            e.preventDefault();
+            cerrar_modal();
+        });
+    });
+
+    $('#tableProducto').bootstrapTable();
+
+    function seleccionarProducto(id, codigo, descripcion, precio) {
+        $('#id_codigo').val(codigo);
+        $('#id_descripcion').val(descripcion);
+        $('#id_precio_detalle').val(precio);
+        $('#btnCancelar').click();
+        $('#id_codigo').select();
+        $('#id_codigo').focus();
+    }
+</script>

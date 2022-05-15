@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'aplicaciones.inventario',
     'aplicaciones.compra',
     'aplicaciones.facturacion',
+    'aplicaciones.api',
     'django_userforeignkey',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

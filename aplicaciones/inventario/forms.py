@@ -72,7 +72,7 @@ class UMForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ['codigo', 'codigo_barra', 'descripcion', 'estado', 'precioc', 'preciov', 'existencia', 'ultima_compra', 'marca', 'subcategoria', 'unidad_medida']
+        fields = ['codigo', 'codigo_barra', 'descripcion', 'estado', 'precio', 'existencia', 'ultima_compra', 'marca', 'subcategoria', 'unidad_medida']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

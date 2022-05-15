@@ -135,7 +135,7 @@
                         <a class="collapse-item {% block compras %} {% endblock compras %}" href="{% url 'cmp:compras' %}">Compras</a>
                         {% endif %}
                         <h6 class="collapse-header">Salidas</h6>
-                        {% if perms.compra.view_comprasenc %}                        
+                        {% if perms.compra.view_facturasenc %}                        
                         <a class="collapse-item {% block facturas %} {% endblock facturas %}" href="{% url 'fac:facturas' %}">Facturas</a>
                         {% endif %}
                     </div>
@@ -322,7 +322,7 @@
     <script>
         {% if messages %}
             {% for message in messages %}
-                console.log("{{ message.tags }}")
+                //console.log("{{ message.tags }}")
                 mensaje("{{ message }}", "{{ message.tags }}");
             {% endfor %}
         {% endif %}
